@@ -30,14 +30,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filt
 
 /* BANNER */
 .banner-section{padding:0;}
-.banner{border-radius:12px;overflow:hidden;position:relative;height:260px;background:#0a0c12;border:1px solid var(--border);}
-.slide{position:absolute;inset:0;opacity:0;transition:opacity 0.5s;display:flex;align-items:center;padding:40px;}
-.slide.active{opacity:1;}
-.slide h2{font-size:30px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;}
-.slide p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:18px;max-width:360px;}
-.slide-cta{background:var(--gold);color:#000;font-weight:700;font-size:13px;padding:9px 20px;border-radius:6px;border:none;cursor:pointer;}
-.slide-emoji{position:absolute;right:40px;top:50%;transform:translateY(-50%);font-size:100px;opacity:0.12;}
-.slide-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;}
+.banner-img-link{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;}
+.banner-img-link img{width:100%;display:block;height:auto;}
+.slide-dots{display:none;}
+.snav{display:none;}
 .dot{width:5px;height:5px;border-radius:3px;background:var(--border);cursor:pointer;transition:all 0.3s;}
 .dot.active{width:18px;background:var(--gold);}
 .snav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
@@ -221,27 +217,9 @@ footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-i
 <!-- HOME -->
 <div id="page-home" class="page active">
   <div class="banner-section">
-    <div class="banner">
-      <div class="slide active">
-        <div><h2>雪球发射台<br>正式上线</h2><p>BSC链上最简单的代币发射平台，8种机制，一键部署，链上透明。</p><button class="slide-cta" onclick="showPage('templates')">立即部署代币</button></div>
-        <div class="slide-emoji">❄️</div>
-      </div>
-      <div class="slide">
-        <div><h2>8大发射机制<br>自由选择</h2><p>标准Mint、时间加权分红、回购销毁等8种机制，满足不同项目需求。</p><button class="slide-cta" onclick="showPage('templates')">查看模板</button></div>
-        <div class="slide-emoji">🚀</div>
-      </div>
-      <div class="slide">
-        <div><h2>LP质押挖矿<br>稳定收益</h2><p>质押LP代币，享受平台手续费分红，稳定长期收益。</p><button class="slide-cta" onclick="showPage('lp')">去质押</button></div>
-        <div class="slide-emoji">🔒</div>
-      </div>
-      <button class="snav sprev" onclick="changeSlide(-1)">‹</button>
-      <button class="snav snext" onclick="changeSlide(1)">›</button>
-      <div class="slide-dots">
-        <div class="dot active" onclick="goSlide(0)"></div>
-        <div class="dot" onclick="goSlide(1)"></div>
-        <div class="dot" onclick="goSlide(2)"></div>
-      </div>
-    </div>
+    <a href="https://reurl.cc/GaW4XD" target="_blank" rel="noopener" class="banner-img-link">
+      <img src="banner.png" alt="BNBS 核心对比">
+    </a>
   </div>
 
   <div class="features">
