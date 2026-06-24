@@ -420,6 +420,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div class="link-lbl">官网链接</div>
         <input type="text" class="link-fi" id="webLink" placeholder="可选">
       </div>
+      <div class="link-row">
+        <div class="link-icon">💬</div>
+        <div class="link-lbl">QQ群链接</div>
+        <input type="text" class="link-fi" id="qqLink" placeholder="可选">
+      </div>
+      <div class="link-row">
+        <div class="link-icon">🟣</div>
+        <div class="link-lbl">DeBox链接</div>
+        <input type="text" class="link-fi" id="deboxLink" placeholder="可选">
+      </div>
     </div>
   </div>
 
@@ -654,7 +664,7 @@ async function doDeploy(){
     if(newAddr){
       const meta=JSON.parse(localStorage.getItem('xq_meta')||'{}');
       meta[newAddr]={
-        desc,avatar:avatarUrl,tg,x,web,
+        desc,avatar:avatarUrl,tg,x,web,qq,debox,
         buyTax,sellTax,mkt,burn,div,reflow,
         mintTimes,mintBNB,tpl:curTplId
       };
