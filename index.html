@@ -29,7 +29,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filt
 .page{display:none;}.page.active{display:block;}
 
 /* BANNER */
-.banner-section{padding:12px 16px;}
+.banner-section{padding:0;}
 .banner{border-radius:12px;overflow:hidden;position:relative;height:260px;background:#0a0c12;border:1px solid var(--border);}
 .slide{position:absolute;inset:0;opacity:0;transition:opacity 0.5s;display:flex;align-items:center;padding:40px;}
 .slide.active{opacity:1;}
@@ -44,8 +44,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filt
 .snav:hover{color:#fff;}.sprev{left:10px;}.snext{right:10px;}
 
 /* FEATURES */
-.features{padding:8px 16px 12px;}
-.feat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:8px;}
+.features{padding:8px 16px 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.feat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;}
 .feat-tag{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
 .feat-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;}
 .feat-desc{font-size:12px;color:var(--muted);line-height:1.6;}
@@ -59,7 +59,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filt
 .tabs{display:flex;gap:4px;margin-bottom:12px;}
 .tab{padding:7px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;}
 .tab.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700;}
-.token-list{display:flex;flex-direction:column;gap:8px;}
+.token-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 
 /* TOKEN CARD - corla style */
 .token-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:border-color 0.2s;}
@@ -251,15 +251,17 @@ footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-i
   </div>
 
   <div class="token-section">
-    <div class="search-box">
-      <span style="color:var(--muted);font-size:14px;">🔍</span>
-      <input type="text" placeholder="输入代币名称或合约地址搜索" id="searchInput" oninput="filterTokens()">
-    </div>
-    <div class="tabs">
-      <button class="tab active" onclick="setTab(this,'all')">新创建</button>
-      <button class="tab" onclick="setTab(this,'soon')">即将发射</button>
-      <button class="tab" onclick="setTab(this,'today')">今日发射</button>
-      <button class="tab" onclick="setTab(this,'done')">已发射</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <div class="search-box" style="max-width:360px;flex:1;">
+        <span style="color:var(--muted);font-size:14px;">🔍</span>
+        <input type="text" placeholder="输入代币名称或合约地址搜索" id="searchInput" oninput="filterTokens()">
+      </div>
+      <div class="tabs" style="margin-bottom:0;">
+        <button class="tab active" onclick="setTab(this,'all')">新创建</button>
+        <button class="tab" onclick="setTab(this,'soon')">即将发射</button>
+        <button class="tab" onclick="setTab(this,'today')">今日发射</button>
+        <button class="tab" onclick="setTab(this,'done')">已发射</button>
+      </div>
     </div>
     <div id="tokenList" class="token-list">
       <div class="loading"><div class="spinner"></div>读取链上数据...</div>
