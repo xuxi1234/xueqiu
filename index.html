@@ -581,7 +581,7 @@ function renderTokens(){
     const statusText=t.launched?'已发射':t.pct>=80?'即将发射':'铸造中';
     const av=t.avatar?`<img src="${t.avatar}" alt="">`:(t.name[0]||'🪙');
     const tplName=TEMPLATES[t.tpl]?.name||'标准Mint';
-    return `<div class="token-card" onclick="openDetail('${t.address}')">
+    return `<div class="token-card" onclick="window.location.href='/token-detail.html?token=${t.address}'">
       <div class="tc-top">
         <div class="tc-avatar">${av}</div>
         <div class="tc-info" style="flex:1;">
