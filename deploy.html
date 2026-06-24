@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创建发射 - Xueqiu 雪球发射台</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#05070b;--bg2:#0a0c12;--bg3:#0f1218;--card:#0c0e15;--card2:#111520;--border:#1a1f2e;--gold:#e8a926;--gold2:#f0b429;--cyan:#00d4c8;--text:#e8eaf0;--muted:#5a6275;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:8px;height:56px;}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;}
+.logo-box{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-size:20px;font-weight:800;color:#fff;}
+.nav-title{font-size:11px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-right:4px;}
+.nav-title-main{font-size:18px;font-weight:700;color:#fff;margin-right:auto;}
+.nav-icon{width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;text-decoration:none;}
+.nav-icon:hover{color:var(--text);}
+.nav-link{color:var(--text);font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;}
+.nav-wallet{background:var(--gold);color:#000;font-weight:700;font-size:13px;padding:7px 16px;border-radius:6px;border:none;cursor:pointer;}
+
+.main{max-width:900px;margin:0 auto;padding:0 20px 60px;}
+
+/* HERO */
+.hero{padding:28px 0 20px;}
+.hero-tag{font-size:11px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.hero-title{font-size:36px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.1;}
+.hero-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.step-pills{display:flex;gap:6px;}
+.step-pill{padding:5px 14px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:500;}
+.step-pill.active{border-color:var(--gold);color:var(--gold);}
+
+/* STATUS */
+.status-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+.status-label{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+.status-val{font-size:14px;font-weight:600;color:#fff;}
+
+/* SECTION CARD */
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);}
+.step-num{width:28px;height:28px;background:var(--gold);color:#000;font-weight:700;font-size:13px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-title{font-size:15px;font-weight:700;color:#fff;}
+.section-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.section-body{padding:18px;}
+
+/* FORMS */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:0;}
+.form-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px;display:block;}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:13px;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--gold);}
+.form-input::placeholder{color:var(--muted);}
+textarea.form-input{resize:vertical;min-height:80px;margin-top:12px;}
+
+/* AVATAR */
+.avatar-area{border:2px dashed var(--border);border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.2s;margin-top:12px;}
+.avatar-area:hover{border-color:var(--gold);}
+.avatar-plus{width:40px;height:40px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#000;flex-shrink:0;}
+.avatar-prev-img{width:40px;height:40px;border-radius:8px;object-fit:cover;display:none;}
+.avatar-text{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
+.avatar-sub{font-size:11px;color:var(--muted);}
+
+/* PAYMENT TOKEN */
+.bnb-btn{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--gold);border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;width:200px;}
+.bnb-dot{width:20px;height:20px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
+
+/* TEMPLATE SELECT */
+.tpl-section{background:linear-gradient(135deg,rgba(10,12,18,0.8),rgba(15,18,30,0.8));border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px;}
+.tpl-section-tag{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.tpl-section-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;}
+.tpl-section-desc{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.tpl-btns{display:flex;gap:8px;}
+.tpl-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--gold);background:var(--gold);color:#000;font-weight:700;font-size:12px;cursor:pointer;}
+.tpl-btn-more{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-weight:600;font-size:12px;cursor:pointer;}
+.cur-tpl{background:var(--bg3);border-radius:6px;padding:10px 14px;margin-top:10px;}
+.cur-tpl-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.cur-tpl-name{font-size:14px;font-weight:700;color:#fff;}
+
+/* COIN SETTING */
+.input-with-max{position:relative;}
+.input-with-max .form-input{padding-right:50px;}
+.max-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--gold);color:#000;font-weight:700;font-size:11px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;}
+
+/* TAX SLIDERS */
+.fee-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.fee-tag{font-size:11px;color:var(--muted);}
+.fee-collect-btn{background:var(--gold);color:#000;font-weight:700;font-size:11px;padding:4px 10px;border-radius:4px;border:none;cursor:pointer;}
+.slider-row{margin-bottom:16px;}
+.slider-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.slider-name{font-size:13px;color:var(--text);}
+.slider-val{font-size:13px;font-weight:700;color:var(--gold);}
+input[type=range]{width:100%;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;}
+.slider-limits{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* PIE CHART */
+.tax-dist{margin-top:16px;border-top:1px solid var(--border);padding-top:16px;}
+.tax-dist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.tax-dist-title{font-size:14px;font-weight:700;color:#fff;}
+.tax-dist-meta{font-size:11px;color:var(--muted);}
+.dist-warning{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;}
+.dist-warning.show{display:block;}
+.dist-layout{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center;}
+.pie-wrap{position:relative;width:140px;height:140px;margin:0 auto;}
+.pie-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;}
+.dist-sliders{}
+.dist-slider-row{margin-bottom:10px;}
+.dist-slider-label{display:flex;justify-content:space-between;margin-bottom:4px;}
+.dist-slider-name{font-size:12px;color:var(--muted);}
+.dist-slider-val{font-size:12px;font-weight:700;color:var(--gold);}
+.dist-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+.dist-legend{margin-top:10px;}
+.dist-legend-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;}
+.dist-legend-name{color:var(--muted);display:flex;align-items:center;gap:4px;}
+.dist-legend-val{color:var(--text);font-weight:600;}
+
+/* WALLET + LINKS */
+.wallet-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:12px;font-family:monospace;outline:none;}
+.wallet-input:focus{border-color:var(--gold);}
+.link-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.link-icon{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.link-label{font-size:12px;font-weight:600;color:var(--text);width:80px;flex-shrink:0;}
+.link-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;outline:none;}
+.link-input::placeholder{color:var(--muted);}
+.link-input:focus{border-color:var(--gold);}
+
+/* DEPLOY BTN */
+.deploy-btn{width:100%;background:var(--gold);color:#000;font-weight:800;font-size:16px;padding:16px;border-radius:8px;border:none;cursor:pointer;margin-top:16px;transition:all 0.2s;}
+.deploy-btn:hover{background:var(--gold2);}
+.deploy-btn:disabled{opacity:0.4;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="window.location.href='/'">
+    <div class="logo-box">❄️</div>
+    <span class="logo-text">Xueqiu</span>
+  </div>
+  <div style="margin-right:auto;">
+    <div class="nav-title">创建代币</div>
+    <div class="nav-title-main" style="font-size:16px;">创建发射</div>
+  </div>
+  <a class="nav-icon" href="#" title="Telegram">✈</a>
+  <a class="nav-icon" href="#" title="Twitter">𝕏</a>
+  <a class="nav-icon" href="#" title="QQ群">💬</a>
+  <button class="nav-link" onclick="window.location.href='/'">返回首页</button>
+  <button class="nav-link">Swap</button>
+  <button class="nav-link">LP质押</button>
+  <button class="nav-link">建设审核员</button>
+  <button class="nav-link">重新开源</button>
+  <button class="nav-wallet" id="connectBtn" onclick="connectWallet()">连接钱包</button>
+</nav>
+
+<div class="main">
+  <div class="hero">
+    <div class="hero-tag">创建代币</div>
+    <div class="hero-title">填写参数，发射你的项目</div>
+    <div class="hero-sub">部署费 0.002 BNB。系统会创建独立代币和独立合约，并在部署成功后进入项目详情页。</div>
+    <div class="step-pills">
+      <div class="step-pill active">01 参数配置</div>
+      <div class="step-pill">02 尾号 00000</div>
+      <div class="step-pill">03 进入详情</div>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-dot" id="statusDot" style="background:var(--muted)"></div>
+    <div>
+      <div class="status-label">部署状态</div>
+      <div class="status-val" id="statusVal">请先连接钱包</div>
+    </div>
+  </div>
+
+  <!-- 01 基础信息 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="step-num">01</div>
+      <div>
+        <div class="section-title">基础信息</div>
+        <div class="section-sub">填写名称、符号、头像和项目简介。</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:10px;color:var(--cyan);font-weight:600;">创建代币</div>
+        <div style="font-size:14px;font-weight:700;color:var(--gold);">发射参数 &nbsp;<span style="background:var(--gold);color:#000;border-radius:4px;padding:2px 8px;font-size:12px;">0.002 BNB</span></div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row2">
+        <div class="form-group">
+          <label class="form-label">代币名称</label>
+          <input type="text" class="form-input" id="dName" placeholder="输入代币名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">代币符号</label>
+          <input type="text" class="form-input" id="dSymbol" placeholder="输入代币符号">
+        </div>
+      </div>
+      <label class="form-label" style="margin-top:12px;display:block;">头像图片</label>
+      <div class="avatar-area" onclick="document.getElementById('avatarInput').click()">
+        <div class="avatar-plus" id="avatarPlus">+</div>
+        <img class="avatar-prev-img" id="avatarImg" src="" alt="">
+        <div>
+          <div class="avatar-text">支持外部格式</div>
+          <div class="avatar-sub">PNG、JPEG、SVG、GIF、WebP，建议小于 1MB</div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatar(this)">
+      </div>
+      <label class="form-label" style="margin-top:12px;display:block;">代币简介（选填）</label>
+      <textarea class="form-input" id="dDesc" placeholder="简单介绍项目定位、玩法或社区信息" style="margin-top:0;"></textarea>
+    </div>
+  </div>
+
+  <!-- 02 支付代币 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="step-num">02</div>
+      <div>
+        <div class="section-title">支付代币</div>
+        <div class="section-sub">当前发射台使用 BNB 支付部署和铸造。</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="bnb-btn">
+        <div class="bnb-dot">🟡</div>BNB
+      </div>
+    </div>
+  </div>
+
+  <!-- 模板选择 -->
+  <div class="tpl-section">
+    <div class="tpl-section-tag">模版列表</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="tpl-section-title">选择发射模版</div>
+        <div class="tpl-section-desc" id="tplDesc">独立代币、独立 Vault、打满后发射，税费支持营销、回流、分红和销毁。</div>
+      </div>
+      <div class="tpl-btns">
+        <button class="tpl-btn" onclick="setTpl(0)">默认</button>
+        <button class="tpl-btn-more" onclick="window.location.href='/template-list'">更多</button>
+      </div>
+    </div>
+    <div class="cur-tpl">
+      <div class="cur-tpl-label">当前模版</div>
+      <div class="cur-tpl-name" id="curTplName">标准 Mint 发射</div>
+    </div>
+  </div>
+
+  <!-- 03 代币设置 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="step-num">03</div>
+      <div>
+        <div class="section-title">代币设置</div>
+        <div class="section-sub">确定发行量、铸造节奏和分红代币。</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row2" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label class="form-label">发行量</label>
+          <div class="input-with-max">
+            <input type="number" class="form-input" id="dSupply" placeholder="1 - 100000000000">
+            <button class="max-btn" onclick="document.getElementById('dSupply').value='100000000000'">MAX</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">铸造次数</label>
+          <input type="number" class="form-input" id="dMintTimes" placeholder="例如 500">
+        </div>
+      </div>
+      <div class="row2" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label class="form-label">单次铸造 BNB</label>
+          <input type="number" class="form-input" id="dMintBNB" placeholder="例如 0.001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">分红代币</label>
+          <input type="text" class="form-input" id="dDividendToken" placeholder="留空默认 USDT">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">分红门槛</label>
+        <input type="number" class="form-input" id="dDividendThreshold" value="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- 税费设置 -->
+  <div class="section-card">
+    <div class="section-body">
+      <div class="fee-header">
+        <div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px;">税费设置</div>
+        </div>
+        <button class="fee-collect-btn">税收代币</button>
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-label">
+          <span class="slider-name">买入总税率</span>
+          <span class="slider-val" id="buyTaxVal">3%</span>
+        </div>
+        <input type="range" min="0" max="10" value="3" step="1" id="buyTaxSlider" oninput="updateTax()">
+        <div class="slider-limits"><span>0%</span><span>10%</span></div>
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-label">
+          <span class="slider-name">卖出总税率</span>
+          <span class="slider-val" id="sellTaxVal">3%</span>
+        </div>
+        <input type="range" min="0" max="10" value="3" step="1" id="sellTaxSlider" oninput="updateTax()">
+        <div class="slider-limits"><span>0%</span><span>10%</span></div>
+      </div>
+
+      <!-- 税收分配 -->
+      <div class="tax-dist">
+        <div class="tax-dist-header">
+          <div class="tax-dist-title">税收分配</div>
+          <div class="tax-dist-meta">总计：<span id="totalPct">0</span>% &nbsp; 未分配：<span id="unallocPct">100</span>%</div>
+        </div>
+        <div class="dist-warning" id="distWarning">总分配必须为 100%</div>
+        <div class="dist-layout">
+          <div class="pie-wrap">
+            <canvas id="pieCanvas" width="140" height="140"></canvas>
+            <div class="pie-label" id="pieLabel">0%</div>
+          </div>
+          <div class="dist-sliders">
+            <div class="dist-slider-row">
+              <div class="dist-slider-label">
+                <span class="dist-slider-name"><span class="dist-dot" style="background:#3b82f6;"></span>营销钱包（结算为 BNB）</span>
+                <span class="dist-slider-val" id="mktPctVal">0%</span>
+              </div>
+              <input type="range" min="0" max="100" value="0" step="1" id="mktPctSlider" oninput="updateDist()">
+            </div>
+            <div class="dist-slider-row">
+              <div class="dist-slider-label">
+                <span class="dist-slider-name"><span class="dist-dot" style="background:#ef4444;"></span>销毁（减少供应量）</span>
+                <span class="dist-slider-val" id="burnPctVal">0%</span>
+              </div>
+              <input type="range" min="0" max="100" value="0" step="1" id="burnPctSlider" oninput="updateDist()">
+            </div>
+            <div class="dist-slider-row">
+              <div class="dist-slider-label">
+                <span class="dist-slider-name"><span class="dist-dot" style="background:#22c55e;"></span>分红（持有者奖励）</span>
+                <span class="dist-slider-val" id="divPctVal">0%</span>
+              </div>
+              <input type="range" min="0" max="100" value="0" step="1" id="divPctSlider" oninput="updateDist()">
+            </div>
+            <div class="dist-slider-row">
+              <div class="dist-slider-label">
+                <span class="dist-slider-name"><span class="dist-dot" style="background:#f59e0b;"></span>流动性（增加流动性）</span>
+                <span class="dist-slider-val" id="reflowPctVal">0%</span>
+              </div>
+              <input type="range" min="0" max="100" value="0" step="1" id="reflowPctSlider" oninput="updateDist()">
+            </div>
+          </div>
+        </div>
+        <div class="dist-legend">
+          <div class="dist-legend-row"><span class="dist-legend-name"><span class="dist-dot" style="background:#3b82f6;"></span>营销钱包（结算为 BNB）</span><span class="dist-legend-val" id="mktLegend">0%</span></div>
+          <div class="dist-legend-row"><span class="dist-legend-name"><span class="dist-dot" style="background:#06b6d4;"></span>流动性（增加流动性）</span><span class="dist-legend-val" id="reflowLegend">0%</span></div>
+          <div class="dist-legend-row"><span class="dist-legend-name"><span class="dist-dot" style="background:#22c55e;"></span>分红（持有者奖励）</span><span class="dist-legend-val" id="divLegend">0%</span></div>
+          <div class="dist-legend-row"><span class="dist-legend-name"><span class="dist-dot" style="background:#ef4444;"></span>销毁（减少供应量）</span><span class="dist-legend-val" id="burnLegend">0%</span></div>
+          <div class="dist-legend-row"><span class="dist-legend-name"><span class="dist-dot" style="background:#374151;"></span>未分配</span><span class="dist-legend-val" id="unallocLegend">100%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 接收钱包 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="step-num">04</div>
+      <div>
+        <div class="section-title">接收钱包</div>
+        <div class="section-sub">创建者钱包会作为部署和项目接收地址；营销税在链上 swap 后转为 BNB 打入该地址</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <input type="text" class="wallet-input" id="marketingWallet" placeholder="0x...（留空使用部署者钱包）">
+    </div>
+  </div>
+
+  <!-- 05 可选链接 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="step-num">05</div>
+      <div>
+        <div class="section-title">可选链接</div>
+        <div class="section-sub">Telegram、X 和官网会随项目简介一起保存。</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="link-row">
+        <div class="link-icon">✈</div>
+        <div class="link-label">Telegram 链接</div>
+        <input type="text" class="link-input" id="tgLink" placeholder="可选">
+      </div>
+      <div class="link-row">
+        <div class="link-icon">𝕏</div>
+        <div class="link-label">X 链接</div>
+        <input type="text" class="link-input" id="xLink" placeholder="可选">
+      </div>
+      <div class="link-row">
+        <div class="link-icon">🌐</div>
+        <div class="link-label">官网链接</div>
+        <input type="text" class="link-input" id="webLink" placeholder="可选">
+      </div>
+    </div>
+  </div>
+
+  <button class="deploy-btn" id="deployBtn" onclick="doDeploy()">部署并进入详情</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<script>
+const FACTORY='0x3525aBD6FfAFACa143954e607B0DB27Bd106a3bC';
+const BSC_ID='0x38';
+const BSC_RPC='https://bsc-dataseed.binance.org/';
+const BSC_PARAMS={chainId:BSC_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:[BSC_RPC],blockExplorerUrls:['https://bscscan.com/']};
+const FACTORY_ABI=[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"name":"_name","type":"string"},{"name":"_symbol","type":"string"},{"name":"_maxSupply","type":"uint256"},{"name":"_mintTargetBNB","type":"uint256"},{"name":"_templateType","type":"uint8"},{"name":"_marketingWallet","type":"address"}],"name":"deployToken","outputs":[{"name":"","type":"address"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"deployFee","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"tokenAddress","type":"address"},{"indexed":true,"name":"creator","type":"address"},{"name":"name","type":"string"},{"name":"symbol","type":"string"},{"name":"templateType","type":"uint8"}],"name":"TokenDeployed","type":"event"}];
+
+let wallet=null,provider=null,signer=null,curTpl=0,avatarUrl=null;
+const TPLS=[
+  {name:'标准 Mint 发射',desc:'独立代币、独立 Vault、打满后发射，税费支持营销、回流、分红和销毁。'},
+  {name:'持币时间加权分红',desc:'按持有时间提高分红权重，适合强调长期持有的项目。'},
+  {name:'回购销毁',desc:'买卖税进入回购池，达到门槛后自动买回本币并转入黑洞。'},
+  {name:'本币 LP 分红',desc:'税费开放LP分代币、持币分LP和销毁。'},
+  {name:'燃烧分红',desc:'营销转BNB，持币分红和黑洞分红按分红代币发放，销毁税直接进黑洞。'},
+  {name:'理财出局分红',desc:'分红仅支持BNB或USDT，用户理财后按出局倍数计算理财分红。'},
+  {name:'开盘限购模板',desc:'标准Mint发射基础上，开盘后按分钟限制单钱包最高持仓。'},
+  {name:'指定代币销毁',desc:'标准Mint发射基础上，税费可买入指定代币并转入黑洞销毁。'},
+];
+
+function setTpl(i){curTpl=i;document.getElementById('curTplName').textContent=TPLS[i].name;document.getElementById('tplDesc').textContent=TPLS[i].desc;}
+
+async function connectWallet(){
+  const btn=document.getElementById('connectBtn');
+  if(!window.ethereum){alert('请先安装 MetaMask');return;}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    const accs=await window.ethereum.request({method:'eth_requestAccounts'});
+    wallet=accs[0];
+    try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_ID}]});}
+    catch(e){if(e.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[BSC_PARAMS]});}
+    signer=await provider.getSigner();
+    btn.textContent='✅ '+wallet.slice(0,6)+'...'+wallet.slice(-4);
+    btn.style.cssText='background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid #22c55e;border-radius:6px;padding:7px 16px;font-weight:700;font-size:13px;cursor:pointer;';
+    document.getElementById('statusDot').style.background='var(--green)';
+    document.getElementById('statusVal').textContent='钱包已连接：'+wallet.slice(0,6)+'...'+wallet.slice(-4);
+    document.getElementById('marketingWallet').placeholder=wallet;
+  }catch(e){if(e.code!==4001)alert('连接失败：'+e.message);}
+}
+
+function handleAvatar(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    avatarUrl=e.target.result;
+    document.getElementById('avatarPlus').style.display='none';
+    const img=document.getElementById('avatarImg');
+    img.src=avatarUrl;img.style.display='block';
+  };
+  r.readAsDataURL(file);
+}
+
+// TAX
+function updateTax(){
+  const b=document.getElementById('buyTaxSlider').value;
+  const s=document.getElementById('sellTaxSlider').value;
+  document.getElementById('buyTaxVal').textContent=b+'%';
+  document.getElementById('sellTaxVal').textContent=s+'%';
+}
+
+// PIE
+const colors=['#3b82f6','#ef4444','#22c55e','#f59e0b','#374151'];
+function updateDist(){
+  const mkt=parseInt(document.getElementById('mktPctSlider').value);
+  const burn=parseInt(document.getElementById('burnPctSlider').value);
+  const div=parseInt(document.getElementById('divPctSlider').value);
+  const reflow=parseInt(document.getElementById('reflowPctSlider').value);
+  const total=mkt+burn+div+reflow;
+  const unalloc=Math.max(0,100-total);
+  document.getElementById('mktPctVal').textContent=mkt+'%';
+  document.getElementById('burnPctVal').textContent=burn+'%';
+  document.getElementById('divPctVal').textContent=div+'%';
+  document.getElementById('reflowPctVal').textContent=reflow+'%';
+  document.getElementById('totalPct').textContent=total;
+  document.getElementById('unallocPct').textContent=unalloc;
+  document.getElementById('mktLegend').textContent=mkt+'%';
+  document.getElementById('reflowLegend').textContent=reflow+'%';
+  document.getElementById('divLegend').textContent=div+'%';
+  document.getElementById('burnLegend').textContent=burn+'%';
+  document.getElementById('unallocLegend').textContent=unalloc+'%';
+  document.getElementById('pieLabel').textContent=total+'%';
+  document.getElementById('distWarning').classList.toggle('show',total!==100);
+  drawPie([mkt,burn,div,reflow,unalloc]);
+}
+
+function drawPie(vals){
+  const canvas=document.getElementById('pieCanvas');
+  const ctx=canvas.getContext('2d');
+  const total=vals.reduce((a,b)=>a+b,0)||1;
+  const cx=70,cy=70,r=60;
+  ctx.clearRect(0,0,140,140);
+  let start=-Math.PI/2;
+  vals.forEach((v,i)=>{
+    const slice=(v/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,start+slice);
+    ctx.closePath();ctx.fillStyle=colors[i];ctx.fill();
+    start+=slice;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,40,0,Math.PI*2);
+  ctx.fillStyle='#0c0e15';ctx.fill();
+}
+
+async function doDeploy(){
+  if(!wallet){await connectWallet();if(!wallet)return;}
+  const name=document.getElementById('dName').value.trim();
+  const symbol=document.getElementById('dSymbol').value.trim();
+  const desc=document.getElementById('dDesc').value.trim();
+  const supply=parseInt(document.getElementById('dSupply').value)||0;
+  const mintTimes=parseInt(document.getElementById('dMintTimes').value)||0;
+  const mintBNB=parseFloat(document.getElementById('dMintBNB').value)||0;
+  const mktW=document.getElementById('marketingWallet').value.trim()||ethers.ZeroAddress;
+  const tg=document.getElementById('tgLink').value.trim();
+  const x=document.getElementById('xLink').value.trim();
+  const web=document.getElementById('webLink').value.trim();
+  const mkt=parseInt(document.getElementById('mktPctSlider').value);
+  const burn=parseInt(document.getElementById('burnPctSlider').value);
+  const div=parseInt(document.getElementById('divPctSlider').value);
+  const reflow=parseInt(document.getElementById('reflowPctSlider').value);
+  const total=mkt+burn+div+reflow;
+
+  if(!name||!symbol){alert('请填写代币名称和符号');return;}
+  if(!supply||supply<1){alert('请填写有效的发行总量');return;}
+  if(mintBNB<=0){alert('请填写单次铸造BNB');return;}
+  if(total!==100){alert('税收分配必须合计为100%，当前：'+total+'%');return;}
+
+  const mintTargetBNB=Math.ceil(mintTimes*mintBNB)||1;
+  const btn=document.getElementById('deployBtn');
+  try{
+    btn.disabled=true;btn.textContent='⏳ 请在 MetaMask 确认...';
+    const fc=new ethers.Contract(FACTORY,FACTORY_ABI,signer);
+    const fee=await fc.deployFee();
+    const tx=await fc.deployToken(name,symbol,supply,mintTargetBNB,curTpl,mktW,{value:fee});
+    btn.textContent='⏳ 等待区块确认...';
+    const rc=await tx.wait();
+    let newAddr='';
+    try{
+      const iface=new ethers.Interface(FACTORY_ABI);
+      for(const log of rc.logs){try{const p=iface.parseLog(log);if(p&&p.name==='TokenDeployed'){newAddr=p.args[0];break;}}catch(e){}}
+    }catch(e){}
+    if(newAddr){
+      const meta=JSON.parse(localStorage.getItem('xq_meta')||'{}');
+      meta[newAddr]={desc,avatar:avatarUrl,tg,x,web};
+      localStorage.setItem('xq_meta',JSON.stringify(meta));
+    }
+    btn.disabled=false;btn.textContent='部署并进入详情';
+    alert('🎉 代币部署成功！\n合约地址：'+newAddr);
+    window.location.href='/';
+  }catch(e){btn.disabled=false;btn.textContent='部署并进入详情';alert(e.reason||e.message||'部署失败');}
+}
+
+drawPie([0,0,0,0,100]);
+</script>
+</body>
+</html>
