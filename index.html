@@ -460,8 +460,61 @@ renderTokens(tokens);
 // MODAL
 function showDeploy() { document.getElementById('deployModal').style.display='flex'; }
 function closeModal() { document.getElementById('deployModal').style.display='none'; }
-function connectWallet() { alert('请安装 MetaMask 或 TokenPocket 以连接 BSC 钱包'); }
-function deployToken() { alert('请先连接 MetaMask 钱包，然后确认合约部署交易'); }
+// BSC Chain ID
+const BSC_CHAIN_ID = '0x38';
+const BSC_PARAMS = {
+  chainId: BSC_CHAIN_ID,
+  chainName: 'BNB Smart Chain',
+  nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+  rpcUrls: ['https://bsc-dataseed.binance.org/'],
+  blockExplorerUrls: ['https://bscscan.com/']
+};
+
+let walletAddress = null;
+
+async function connectWallet() {
+  const btn = document.querySelector('.connect-btn');
+  if (!window.ethereum) {
+    alert('请先安装 MetaMask 钱包插件\nhttps://metamask.io/download/');
+    return;
+  }
+  try {
+    btn.textContent = '连接中...';
+    // 请求账户
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    walletAddress = accounts[0];
+    // 切换到BSC网络
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_ID }] });
+    } catch(e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [BSC_PARAMS] });
+      }
+    }
+    // 更新按钮
+    const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+    btn.textContent = '✅ ' + short;
+    btn.style.background = 'rgba(16,185,129,0.15)';
+    btn.style.color = '#10b981';
+    btn.style.borderColor = '#10b981';
+    // 监听账户变化
+    window.ethereum.on('accountsChanged', (accs) => {
+      if(accs.length === 0) { walletAddress=null; btn.textContent='连接钱包'; btn.style=''; }
+      else { walletAddress=accs[0]; btn.textContent='✅ '+accs[0].slice(0,6)+'...'+accs[0].slice(-4); }
+    });
+  } catch(e) {
+    btn.textContent = '连接钱包';
+    if(e.code !== 4001) alert('连接失败：' + e.message);
+  }
+}
+
+async function deployToken() {
+  if (!walletAddress) {
+    await connectWallet();
+    if (!walletAddress) return;
+  }
+  alert('✅ 钱包已连接：' + walletAddress + '\n\n智能合约部署功能即将上线，敬请期待！');
+}
 document.getElementById('deployModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 </script>
 </body>
