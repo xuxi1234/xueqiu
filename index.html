@@ -379,7 +379,40 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script>
+// ============ 合约配置 ============
+// 部署后把工厂合约地址填在这里
+const FACTORY_ADDRESS = null; // 例：'0x1234...abcd'
+
+const FACTORY_ABI = [
+  {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[{"name":"_name","type":"string"},{"name":"_symbol","type":"string"},{"name":"_maxSupply","type":"uint256"},{"name":"_mintTargetBNB","type":"uint256"}],"name":"deployToken","outputs":[{"name":"","type":"address"}],"stateMutability":"payable","type":"function"},
+  {"inputs":[],"name":"getAllTokens","outputs":[{"components":[{"name":"tokenAddress","type":"address"},{"name":"name","type":"string"},{"name":"symbol","type":"string"},{"name":"creator","type":"address"},{"name":"createdAt","type":"uint256"},{"name":"mintTarget","type":"uint256"}],"name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"deployFee","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+];
+
+const TOKEN_ABI = [
+  {"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[],"name":"getMintProgress","outputs":[{"name":"raised","type":"uint256"},{"name":"target","type":"uint256"},{"name":"percent","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"launched","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"refund","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
+
+const BSC_CHAIN_ID = '0x38';
+const BSC_PARAMS = {
+  chainId: BSC_CHAIN_ID, chainName: 'BNB Smart Chain',
+  nativeCurrency: {name:'BNB',symbol:'BNB',decimals:18},
+  rpcUrls:['https://bsc-dataseed.binance.org/'],
+  blockExplorerUrls:['https://bscscan.com/']
+};
+
+let walletAddress = null;
+let provider = null;
+let signer = null;
 // SNOW
 const canvas = document.getElementById('snow-canvas');
 const ctx = canvas.getContext('2d');
@@ -460,18 +493,6 @@ renderTokens(tokens);
 // MODAL
 function showDeploy() { document.getElementById('deployModal').style.display='flex'; }
 function closeModal() { document.getElementById('deployModal').style.display='none'; }
-// BSC Chain ID
-const BSC_CHAIN_ID = '0x38';
-const BSC_PARAMS = {
-  chainId: BSC_CHAIN_ID,
-  chainName: 'BNB Smart Chain',
-  nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-  rpcUrls: ['https://bsc-dataseed.binance.org/'],
-  blockExplorerUrls: ['https://bscscan.com/']
-};
-
-let walletAddress = null;
-
 async function connectWallet() {
   const btn = document.querySelector('.connect-btn');
   if (!window.ethereum) {
@@ -480,26 +501,23 @@ async function connectWallet() {
   }
   try {
     btn.textContent = '连接中...';
-    // 请求账户
+    provider = new ethers.BrowserProvider(window.ethereum);
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     walletAddress = accounts[0];
-    // 切换到BSC网络
+    // 切换到BSC
     try {
       await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_ID }] });
     } catch(e) {
-      if (e.code === 4902) {
-        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [BSC_PARAMS] });
-      }
+      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [BSC_PARAMS] });
     }
-    // 更新按钮
+    signer = await provider.getSigner();
     const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
     btn.textContent = '✅ ' + short;
     btn.style.background = 'rgba(16,185,129,0.15)';
     btn.style.color = '#10b981';
     btn.style.borderColor = '#10b981';
-    // 监听账户变化
     window.ethereum.on('accountsChanged', (accs) => {
-      if(accs.length === 0) { walletAddress=null; btn.textContent='连接钱包'; btn.style=''; }
+      if(!accs.length) { walletAddress=null; signer=null; btn.textContent='连接钱包'; btn.removeAttribute('style'); }
       else { walletAddress=accs[0]; btn.textContent='✅ '+accs[0].slice(0,6)+'...'+accs[0].slice(-4); }
     });
   } catch(e) {
@@ -509,11 +527,51 @@ async function connectWallet() {
 }
 
 async function deployToken() {
-  if (!walletAddress) {
-    await connectWallet();
-    if (!walletAddress) return;
+  if (!walletAddress) { await connectWallet(); if (!walletAddress) return; }
+
+  const nameEl = document.querySelectorAll('#deployModal input')[0];
+  const symEl  = document.querySelectorAll('#deployModal input')[1];
+  const supEl  = document.querySelectorAll('#deployModal input')[2];
+  const tgtEl  = document.querySelectorAll('#deployModal input')[3];
+
+  const tokenName = nameEl.value.trim();
+  const tokenSym  = symEl.value.trim();
+  const maxSupply = parseInt(supEl.value);
+  const mintTarget = parseInt(tgtEl.value);
+
+  if (!tokenName || !tokenSym) return alert('请填写代币名称和符号');
+  if (!maxSupply || maxSupply < 1) return alert('请填写有效的发行总量');
+  if (!mintTarget || mintTarget < 1) return alert('铸造目标至少 1 BNB');
+
+  if (!FACTORY_ADDRESS) {
+    alert('⚠️ 工厂合约尚未部署到BSC主网\n\n请联系平台管理员完成合约部署。\n\n合约代码已准备好，只需要：\n1. 用 Remix IDE 部署 XueqiuFactory 合约\n2. 填入合约地址\n\n预计费用：~0.05 BNB gas费');
+    return;
   }
-  alert('✅ 钱包已连接：' + walletAddress + '\n\n智能合约部署功能即将上线，敬请期待！');
+
+  try {
+    const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+    const fee = await factory.deployFee();
+    const deployBtn = document.querySelector('#deployModal button');
+    deployBtn.textContent = '⏳ 部署中，请在MetaMask确认...';
+    deployBtn.disabled = true;
+
+    const tx = await factory.deployToken(tokenName, tokenSym, maxSupply, mintTarget, { value: fee });
+    deployBtn.textContent = '⏳ 等待区块确认...';
+    const receipt = await tx.wait();
+
+    // 从事件获取新代币地址
+    const event = receipt.logs[0];
+    const newTokenAddr = '0x' + event.topics[1].slice(26);
+
+    deployBtn.textContent = '连接钱包并部署';
+    deployBtn.disabled = false;
+    closeModal();
+    alert(`🎉 代币部署成功！\n\n合约地址：${newTokenAddr}\n\n查看：https://bscscan.com/token/${newTokenAddr}`);
+  } catch(e) {
+    document.querySelector('#deployModal button').textContent = '连接钱包并部署';
+    document.querySelector('#deployModal button').disabled = false;
+    alert('部署失败：' + (e.reason || e.message));
+  }
 }
 document.getElementById('deployModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 </script>
