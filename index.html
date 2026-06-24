@@ -11,7 +11,8 @@
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:8px;height:56px;}
+nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0;}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:8px;height:56px;}
 .logo{display:flex;align-items:center;gap:8px;margin-right:auto;text-decoration:none;cursor:pointer;}
 .logo-box{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .logo-text{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
@@ -28,26 +29,25 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filt
 /* PAGES */
 .page{display:none;}.page.active{display:block;}
 
+/* DESKTOP CONTAINER */
+.main-wrap{width:100%;max-width:1100px;margin:0 auto;padding:0 24px;}
+
 /* BANNER */
-.banner-section{padding:0;}
+.banner-section{padding:16px 0 0;}
 .banner-img-link{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;}
-.banner-img-link img{width:100%;display:block;height:auto;}
+.banner-img-link img{width:100%;display:block;height:auto;max-height:380px;object-fit:contain;background:#000;}
 .slide-dots{display:none;}
 .snav{display:none;}
-.dot{width:5px;height:5px;border-radius:3px;background:var(--border);cursor:pointer;transition:all 0.3s;}
-.dot.active{width:18px;background:var(--gold);}
-.snav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.snav:hover{color:#fff;}.sprev{left:10px;}.snext{right:10px;}
 
 /* FEATURES */
-.features{padding:8px 16px 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.features{padding:12px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .feat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;}
 .feat-tag{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
 .feat-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;}
 .feat-desc{font-size:12px;color:var(--muted);line-height:1.6;}
 
 /* TOKEN LIST */
-.token-section{padding:0 16px 60px;}
+.token-section{padding:0 0 60px;}
 .search-wrap{margin-bottom:0;}
 .search-box{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;}
 .search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
@@ -190,14 +190,26 @@ textarea.form-input{resize:vertical;min-height:70px;}
 .toast.err{border-color:var(--red);color:var(--red);}
 
 footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:11px;flex-wrap:wrap;gap:8px;}
+.footer-inner{max-width:1100px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .footer-links{display:flex;gap:14px;}
 .footer-links a{color:var(--muted);text-decoration:none;}
 .footer-links a:hover{color:var(--text);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .main-wrap{padding:0 12px;}
+  .nav-inner{padding:0 12px;}
+  .banner-img-link img{max-height:none;}
+  .features{grid-template-columns:1fr;padding:10px 0;}
+  .token-list{grid-template-columns:1fr;}
+  .token-section{padding:0 0 80px;}
+}
 </style>
 </head>
 <body>
 
 <nav>
+<div class="nav-inner">
   <div class="logo" onclick="showPage('home')">
     <div class="logo-box">❄️</div>
     <span class="logo-text">Xueqiu</span>
@@ -212,10 +224,12 @@ footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-i
   <button class="nav-link" onclick="showPage('home')">重新开源</button>
   <button class="nav-deploy" onclick="window.location.href='/deploy.html'">部署代币</button>
   <button class="nav-wallet" id="connectBtn" onclick="connectWallet()">连接钱包</button>
+</div>
 </nav>
 
 <!-- HOME -->
 <div id="page-home" class="page active">
+<div class="main-wrap">
   <div class="banner-section">
     <a href="https://reurl.cc/GaW4XD" target="_blank" rel="noopener" class="banner-img-link">
       <img src="banner.png" alt="BNBS 核心对比">
@@ -245,7 +259,8 @@ footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-i
       <div class="loading"><div class="spinner"></div>读取链上数据...</div>
     </div>
   </div>
-</div>
+</div><!-- /main-wrap -->
+</div><!-- /page-home -->
 
 <!-- TEMPLATE PAGE -->
 <div id="page-templates" class="page">
@@ -423,8 +438,10 @@ footer{border-top:1px solid var(--border);padding:16px 20px;display:flex;align-i
 <div class="toast" id="toast"></div>
 
 <footer>
+<div class="footer-inner">
   <div>© 2026 Xueqiu 雪球发射台 · BNB Smart Chain</div>
   <div class="footer-links"><a href="#">Telegram</a><a href="#">Twitter</a><a href="#">白皮书</a></div>
+</div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
