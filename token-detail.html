@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代币详情 - Xueqiu 雪球发射台</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#05070b;--bg2:#0a0c12;--bg3:#0f1218;--card:#0c0e15;--border:#1a1f2e;--gold:#e8a926;--gold2:#f0b429;--cyan:#00d4c8;--text:#e8eaf0;--muted:#5a6275;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,7,11,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:8px;height:56px;}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;margin-right:auto;}
+.logo-box{width:34px;height:34px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-text{font-size:18px;font-weight:800;color:#fff;}
+.nav-title-wrap{margin-right:auto;}
+.nav-tag{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+.nav-name{font-size:15px;font-weight:700;color:#fff;line-height:1.2;}
+.nav-btn{color:var(--text);font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block;}
+.nav-wallet{background:transparent;color:var(--gold);font-weight:600;font-size:13px;padding:7px 14px;border-radius:6px;border:1px solid var(--gold);cursor:pointer;}
+.nav-wallet.connected{background:rgba(34,197,94,0.1);color:var(--green);border-color:var(--green);}
+
+/* MAIN */
+.main{max-width:640px;margin:0 auto;padding:20px 16px 80px;}
+
+/* SECTION CARDS */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;}
+.sec-tag{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+
+/* 铸造信息 */
+.mint-info-row{display:flex;align-items:center;gap:12px;}
+.token-avatar{width:52px;height:52px;border-radius:12px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;}
+.token-avatar img{width:100%;height:100%;object-fit:cover;}
+.token-name-wrap{}
+.token-name{font-size:20px;font-weight:800;color:#fff;line-height:1.2;}
+.token-sym{font-size:12px;color:var(--muted);margin-top:3px;}
+.token-loading{font-size:13px;color:var(--muted);}
+
+/* 发射状态 */
+.status-row{display:flex;align-items:center;gap:8px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.status-dot.minting{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.4);}
+.status-dot.done{background:var(--gold);}
+.status-dot.refund{background:var(--red);}
+.status-text{font-size:15px;font-weight:700;color:#fff;}
+
+/* 铸造进度 */
+.prog-pct{font-size:32px;font-weight:800;color:#fff;margin-bottom:10px;}
+.prog-bar-wrap{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:8px;}
+.prog-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.5s ease;}
+.prog-sub{font-size:12px;color:var(--muted);}
+
+/* 铸造价格 */
+.price-label{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.price-val{font-size:28px;font-weight:800;color:#fff;margin-bottom:4px;}
+.price-sub{font-size:12px;color:var(--muted);}
+
+/* 我的铸造 */
+.my-mint-label{font-size:10px;color:var(--cyan);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.my-mint-val{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;}
+.my-mint-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+
+/* 铸造输入 */
+.mint-input-wrap{margin-bottom:12px;}
+.mint-input-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;}
+.mint-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:#fff;font-size:16px;font-weight:700;outline:none;transition:border-color 0.2s;}
+.mint-input:focus{border-color:var(--gold);}
+.mint-input::placeholder{color:var(--muted);}
+.mint-preview{background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;}
+.mint-preview-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.mint-preview-row:last-child{margin-bottom:0;}
+
+/* 按钮 */
+.mint-btn{width:100%;background:var(--gold);color:#000;font-weight:800;font-size:15px;padding:14px;border-radius:8px;border:none;cursor:pointer;margin-bottom:8px;transition:opacity 0.2s;}
+.mint-btn:hover{opacity:0.9;}
+.mint-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.refresh-btn{width:100%;background:transparent;color:var(--muted);font-weight:500;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s;}
+.refresh-btn:hover{color:var(--text);border-color:var(--muted);}
+.refund-btn{width:100%;background:transparent;color:var(--red);font-weight:600;font-size:12px;padding:9px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);cursor:pointer;margin-top:8px;transition:all 0.2s;display:none;}
+.refund-btn:hover{background:rgba(239,68,68,0.08);}
+.launched-box{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:16px;text-align:center;color:var(--green);font-weight:600;font-size:14px;}
+
+/* 项目描述 */
+.desc-text{font-size:13px;color:var(--muted);line-height:1.75;}
+
+/* 合约 */
+.contract-row{display:flex;align-items:center;gap:8px;font-size:11px;}
+.contract-label{color:var(--muted);}
+.contract-addr{font-family:monospace;color:var(--blue);font-size:11px;flex:1;word-break:break-all;}
+.contract-link{color:var(--blue);text-decoration:none;font-size:11px;white-space:nowrap;}
+.contract-link:hover{text-decoration:underline;}
+.copy-btn{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--muted);padding:3px 8px;font-size:10px;cursor:pointer;white-space:nowrap;}
+.copy-btn:hover{color:var(--text);}
+
+/* 社区链接 */
+.social-row{display:flex;gap:8px;flex-wrap:wrap;}
+.social-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;color:var(--text);text-decoration:none;transition:border-color 0.2s;}
+.social-btn:hover{border-color:var(--muted);}
+
+/* 持有人列表 */
+.holders-list{display:flex;flex-direction:column;gap:6px;}
+.holder-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border-radius:6px;}
+.holder-addr{font-family:monospace;font-size:11px;color:var(--text);}
+.holder-pct{font-size:12px;font-weight:600;color:var(--gold);}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--text);z-index:999;transform:translateY(60px);opacity:0;transition:all 0.3s;max-width:280px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+
+/* LOADING */
+.loading{display:flex;align-items:center;gap:8px;padding:20px;color:var(--muted);font-size:13px;}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <div class="logo-box">❄️</div>
+    <span class="logo-text">Xueqiu</span>
+  </a>
+  <div class="nav-title-wrap">
+    <div class="nav-tag">项目详情</div>
+    <div class="nav-name" id="navName">代币详情</div>
+  </div>
+  <a class="nav-btn" href="/">返回首页</a>
+  <button class="nav-btn">Swap</button>
+  <button class="nav-btn">LP质押</button>
+  <button class="nav-btn">建设审核员</button>
+  <button class="nav-btn">重新开源</button>
+  <button class="nav-wallet" id="connectBtn" onclick="connectWallet()">连接钱包</button>
+</nav>
+
+<div class="main">
+
+  <!-- 铸造信息 -->
+  <div class="sec">
+    <div class="sec-tag">铸造信息</div>
+    <div class="mint-info-row">
+      <div class="token-avatar" id="tokenAvatar">🪙</div>
+      <div class="token-name-wrap">
+        <div class="token-name" id="tokenName">--</div>
+        <div class="token-sym" id="tokenSym">读取链上发射信息。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 发射状态 -->
+  <div class="sec">
+    <div class="sec-tag">发射状态</div>
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="status-text" id="statusText">准备读取</div>
+    </div>
+  </div>
+
+  <!-- 铸造进度 -->
+  <div class="sec">
+    <div class="sec-tag">铸造进度</div>
+    <div class="prog-pct" id="progPct">0.00%</div>
+    <div class="prog-bar-wrap"><div class="prog-bar-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-sub" id="progSub">-- / -- &nbsp;目标 -- BNB</div>
+  </div>
+
+  <!-- 铸造价格 -->
+  <div class="sec">
+    <div class="price-label">铸造价格</div>
+    <div class="price-val" id="priceVal">--</div>
+    <div class="price-sub">每个钱包限铸造一次</div>
+  </div>
+
+  <!-- 我的铸造 -->
+  <div class="sec" id="mintSection">
+    <div class="my-mint-label">我的铸造</div>
+    <div class="my-mint-val" id="myMintVal">连接钱包后显示</div>
+    <div class="my-mint-sub" id="myMintSub">每个钱包限铸造一次</div>
+
+    <div class="mint-input-wrap" id="mintInputWrap">
+      <div class="mint-input-label">输入 BNB 数量</div>
+      <input type="number" class="mint-input" id="mintAmt" placeholder="0.1" min="0.001" step="0.001" oninput="updatePreview()">
+    </div>
+    <div class="mint-preview" id="mintPreview" style="display:none;">
+      <div class="mint-preview-row">
+        <span style="color:var(--muted)">预计获得代币</span>
+        <span style="font-weight:600;color:#fff;" id="previewTokens">--</span>
+      </div>
+      <div class="mint-preview-row">
+        <span style="color:var(--muted)">当前进度</span>
+        <span style="font-weight:600;color:#fff;" id="previewProg">--</span>
+      </div>
+      <div class="mint-preview-row">
+        <span style="color:var(--muted)">网络</span>
+        <span style="font-weight:600;color:#fff;">BSC Mainnet</span>
+      </div>
+    </div>
+
+    <button class="mint-btn" id="mintBtn" onclick="doMint()">铸造</button>
+    <button class="refresh-btn" id="refreshBtn" onclick="loadTokenDetail()">刷新</button>
+    <button class="refund-btn" id="refundBtn" onclick="doRefund()">申请退款</button>
+  </div>
+
+  <!-- 项目描述 -->
+  <div class="sec" id="descSec" style="display:none;">
+    <div class="sec-tag">项目简介</div>
+    <div class="desc-text" id="descText"></div>
+  </div>
+
+  <!-- 社区链接 -->
+  <div class="sec" id="socialSec" style="display:none;">
+    <div class="sec-tag">社区链接</div>
+    <div class="social-row" id="socialRow"></div>
+  </div>
+
+  <!-- 合约地址 -->
+  <div class="sec">
+    <div class="sec-tag">合约信息</div>
+    <div class="contract-row">
+      <span class="contract-label">合约</span>
+      <span class="contract-addr" id="contractAddr">--</span>
+      <button class="copy-btn" onclick="copyAddr()">复制</button>
+      <a class="contract-link" id="bscscanLink" href="#" target="_blank">BscScan ↗</a>
+    </div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="tokenMetaGrid"></div>
+  </div>
+
+  <!-- 持有人 -->
+  <div class="sec" id="holdersSec" style="display:none;">
+    <div class="sec-tag">持有人列表</div>
+    <div class="holders-list" id="holdersList"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<script>
+const BSC_ID='0x38';
+const BSC_RPC='https://bsc-dataseed.binance.org/';
+const BSC_PARAMS={chainId:BSC_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:[BSC_RPC],blockExplorerUrls:['https://bscscan.com/']};
+
+const TOKEN_ABI=[
+  {"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[],"name":"refund","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"getMintProgress","outputs":[{"name":"raised","type":"uint256"},{"name":"target","type":"uint256"},{"name":"percent","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"maxSupply","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"mintTarget","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"launched","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"refundEnabled","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"templateType","outputs":[{"name":"","type":"uint8"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"name":"","type":"address"}],"name":"mintContribution","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+];
+
+const TPL_NAMES=['标准Mint','时间加权分红','回购销毁','LP分红','燃烧分红','理财出局','开盘限购','指定代币销毁'];
+
+let wallet=null,provider=null,signer=null,readProv=null;
+let tokenAddr=null,tokenData=null,myContrib=0n;
+
+function getRPC(){if(!readProv)readProv=new ethers.JsonRpcProvider(BSC_RPC);return readProv;}
+
+// 从URL获取token地址
+function getTokenAddr(){
+  const p=new URLSearchParams(location.search);
+  return p.get('token');
+}
+
+async function connectWallet(){
+  const btn=document.getElementById('connectBtn');
+  if(!window.ethereum){toast('请先安装 MetaMask','err');return;}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    const accs=await window.ethereum.request({method:'eth_requestAccounts'});
+    wallet=accs[0];
+    try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_ID}]});}
+    catch(e){if(e.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[BSC_PARAMS]});}
+    signer=await provider.getSigner();
+    btn.textContent='✅ '+wallet.slice(0,6)+'...'+wallet.slice(-4);
+    btn.classList.add('connected');
+    toast('钱包连接成功','ok');
+    loadMyMint();
+    window.ethereum.on('accountsChanged',a=>{
+      if(!a.length){wallet=null;signer=null;btn.textContent='连接钱包';btn.classList.remove('connected');}
+      else{wallet=a[0];btn.textContent='✅ '+a[0].slice(0,6)+'...'+a[0].slice(-4);loadMyMint();}
+    });
+  }catch(e){if(e.code!==4001)toast('连接失败','err');}
+}
+
+async function loadTokenDetail(){
+  tokenAddr=getTokenAddr();
+  if(!tokenAddr){document.getElementById('tokenName').textContent='参数错误';return;}
+
+  // 更新合约地址显示
+  document.getElementById('contractAddr').textContent=tokenAddr;
+  document.getElementById('bscscanLink').href='https://bscscan.com/address/'+tokenAddr;
+
+  // 读取本地元数据
+  const meta=JSON.parse(localStorage.getItem('xq_meta')||'{}')[tokenAddr]||{};
+
+  // 头像
+  if(meta.avatar){
+    document.getElementById('tokenAvatar').innerHTML=`<img src="${meta.avatar}" alt="">`;
+  }
+
+  // 描述
+  if(meta.desc){
+    document.getElementById('descText').textContent=meta.desc;
+    document.getElementById('descSec').style.display='block';
+  }
+
+  // 社区链接
+  const socialLinks=[];
+  if(meta.tg) socialLinks.push(`<a class="social-btn" href="${meta.tg}" target="_blank">✈ Telegram</a>`);
+  if(meta.x) socialLinks.push(`<a class="social-btn" href="${meta.x}" target="_blank">𝕏 Twitter</a>`);
+  if(meta.web) socialLinks.push(`<a class="social-btn" href="${meta.web}" target="_blank">🌐 官网</a>`);
+  if(socialLinks.length){
+    document.getElementById('socialRow').innerHTML=socialLinks.join('');
+    document.getElementById('socialSec').style.display='block';
+  }
+
+  try{
+    const tc=new ethers.Contract(tokenAddr,TOKEN_ABI,getRPC());
+    const [name,symbol,launched,refundEnabled,tplType,mintTarget,[raised,target,pct]]=await Promise.all([
+      tc.name(), tc.symbol(), tc.launched(), tc.refundEnabled(),
+      tc.templateType(), tc.mintTarget(),
+      tc.getMintProgress()
+    ]);
+
+    tokenData={name,symbol,launched,refundEnabled,tplType:Number(tplType),mintTarget,raised,target,pct:Number(pct)};
+
+    // 更新UI
+    document.getElementById('navName').textContent=name;
+    document.getElementById('tokenName').textContent=name;
+    document.getElementById('tokenSym').textContent=symbol+' · '+TPL_NAMES[Number(tplType)]||'';
+
+    // 状态
+    const dot=document.getElementById('statusDot');
+    const statusText=document.getElementById('statusText');
+    if(refundEnabled){dot.className='status-dot refund';statusText.textContent='退款中';}
+    else if(launched){dot.className='status-dot done';statusText.textContent='已发射';}
+    else{dot.className='status-dot minting';statusText.textContent='铸造中';}
+
+    // 进度
+    const raisedF=parseFloat(ethers.formatEther(raised)).toFixed(4);
+    const targetF=parseFloat(ethers.formatEther(target)).toFixed(0);
+    const pctF=Number(pct).toFixed(2);
+    document.getElementById('progPct').textContent=pctF+'%';
+    document.getElementById('progFill').style.width=Math.min(Number(pct),100)+'%';
+    document.getElementById('progSub').textContent=`${raisedF} / ${targetF} 目标 ${targetF} BNB`;
+
+    // 价格
+    document.getElementById('priceVal').textContent=targetF+' BNB';
+
+    // 合约meta
+    document.getElementById('tokenMetaGrid').innerHTML=`
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">模板类型</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;">${TPL_NAMES[Number(tplType)]||'未知'}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">铸造目标</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;">${targetF} BNB</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">已筹集</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;">${raisedF} BNB</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">进度</div>
+        <div style="font-size:13px;font-weight:600;color:var(--gold);">${pctF}%</div>
+      </div>
+    `;
+
+    // 铸造按钮状态
+    if(launched){
+      document.getElementById('mintSection').innerHTML=`<div class="launched-box">🎉 该代币已成功发射！<br><br><a href="https://bscscan.com/token/${tokenAddr}" target="_blank" style="color:var(--blue);font-size:12px;">在 BscScan 查看 ↗</a></div>`;
+    } else {
+      document.getElementById('mintBtn').textContent=wallet?'铸造':'连接钱包参与铸造';
+      if(refundEnabled) document.getElementById('refundBtn').style.display='block';
+      document.getElementById('mintPreview').style.display='block';
+    }
+
+    // 加载我的铸造
+    if(wallet) loadMyMint();
+
+  }catch(e){
+    document.getElementById('tokenName').textContent='加载失败';
+    document.getElementById('tokenSym').textContent=e.message;
+    toast('加载失败：'+e.message,'err');
+  }
+}
+
+async function loadMyMint(){
+  if(!wallet||!tokenAddr||!tokenData) return;
+  try{
+    const tc=new ethers.Contract(tokenAddr,TOKEN_ABI,getRPC());
+    const [contrib,balance]=await Promise.all([tc.mintContribution(wallet),tc.balanceOf(wallet)]);
+    myContrib=contrib;
+    const c=parseFloat(ethers.formatEther(contrib));
+    const b=parseFloat(ethers.formatEther(balance));
+    if(c>0){
+      document.getElementById('myMintVal').textContent=`已铸造 ${c.toFixed(4)} BNB`;
+      document.getElementById('myMintSub').textContent=`持有 ${b.toFixed(2)} ${tokenData.symbol}`;
+      if(tokenData.refundEnabled) document.getElementById('refundBtn').style.display='block';
+    } else {
+      document.getElementById('myMintVal').textContent='尚未参与铸造';
+      document.getElementById('myMintSub').textContent='每个钱包限铸造一次';
+    }
+  }catch(e){}
+}
+
+function updatePreview(){
+  if(!tokenData) return;
+  const bnb=parseFloat(document.getElementById('mintAmt').value)||0;
+  if(bnb>0){
+    const target=parseFloat(ethers.formatEther(tokenData.target));
+    const raised=parseFloat(ethers.formatEther(tokenData.raised));
+    const newPct=Math.min(100,((raised+bnb)/target*100)).toFixed(2);
+    document.getElementById('previewTokens').textContent='-- '+tokenData.symbol;
+    document.getElementById('previewProg').textContent=tokenData.pct.toFixed(2)+'% → '+newPct+'%';
+  }
+}
+
+async function doMint(){
+  if(!wallet){await connectWallet();if(!wallet)return;}
+  const bnb=parseFloat(document.getElementById('mintAmt').value);
+  if(!bnb||bnb<=0){toast('请输入有效的BNB数量','err');return;}
+  const btn=document.getElementById('mintBtn');
+  try{
+    btn.disabled=true;btn.textContent='⏳ 请在MetaMask确认...';
+    const tc=new ethers.Contract(tokenAddr,TOKEN_ABI,signer);
+    const tx=await tc.mint({value:ethers.parseEther(bnb.toString())});
+    btn.textContent='⏳ 等待区块确认...';
+    await tx.wait();
+    toast('铸造成功！🎉','ok');
+    btn.disabled=false;btn.textContent='铸造';
+    document.getElementById('mintAmt').value='';
+    loadTokenDetail();
+  }catch(e){
+    btn.disabled=false;btn.textContent='铸造';
+    toast(e.reason||e.message||'铸造失败','err');
+  }
+}
+
+async function doRefund(){
+  if(!wallet){await connectWallet();if(!wallet)return;}
+  if(!confirm('确定要申请退款吗？')) return;
+  try{
+    const tc=new ethers.Contract(tokenAddr,TOKEN_ABI,signer);
+    const tx=await tc.refund();
+    toast('⏳ 退款处理中...');
+    await tx.wait();
+    toast('退款成功！','ok');
+    loadTokenDetail();
+  }catch(e){toast(e.reason||e.message,'err');}
+}
+
+function copyAddr(){
+  if(tokenAddr) navigator.clipboard.writeText(tokenAddr).then(()=>toast('合约地址已复制','ok'));
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// 初始化
+loadTokenDetail();
+</script>
+</body>
+</html>
