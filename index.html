@@ -6,574 +6,671 @@
 <title>Xueqiu 雪球发射台</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #060a12;
-    --bg2: #0d1220;
-    --bg3: #111827;
-    --card: #0f172a;
-    --border: #1e2d45;
-    --accent: #3b82f6;
-    --accent2: #60a5fa;
-    --snow: #e0f0ff;
-    --gold: #f0b429;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --green: #10b981;
-    --red: #ef4444;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; overflow-x:hidden; }
+:root{--bg:#060a12;--bg2:#0d1220;--bg3:#111827;--card:#0f172a;--border:#1e2d45;--accent:#3b82f6;--accent2:#60a5fa;--gold:#f0b429;--text:#e2e8f0;--muted:#64748b;--green:#10b981;--red:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+#snow-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.3;}
 
-  /* SNOW PARTICLES */
-  #snow-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.35; }
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(6,10,18,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:12px;height:60px;}
+.logo{display:flex;align-items:center;gap:8px;margin-right:auto;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;text-decoration:none;cursor:pointer;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#60a5fa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.nav-links{display:flex;align-items:center;gap:2px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding:5px 10px;border-radius:6px;transition:all 0.2s;}
+.nav-links a:hover{color:var(--text);background:var(--bg3);}
+.nav-btn{background:var(--gold);color:#000;font-weight:700;font-size:13px;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.nav-btn:hover{background:#e0a820;transform:translateY(-1px);}
+.connect-btn{background:transparent;color:var(--accent2);font-weight:600;font-size:13px;padding:7px 16px;border-radius:8px;border:1px solid var(--accent);cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.connect-btn:hover{background:rgba(59,130,246,0.1);}
 
-  /* NAV */
-  nav {
-    position:sticky; top:0; z-index:100;
-    background:rgba(6,10,18,0.85);
-    backdrop-filter:blur(16px);
-    border-bottom:1px solid var(--border);
-    padding:0 32px;
-    display:flex; align-items:center; gap:16px; height:64px;
-  }
-  .logo {
-    display:flex; align-items:center; gap:10px; margin-right:auto;
-    font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700;
-    color:#fff; text-decoration:none;
-  }
-  .logo-icon {
-    width:36px; height:36px; background:linear-gradient(135deg,#3b82f6,#60a5fa);
-    border-radius:10px; display:flex; align-items:center; justify-content:center;
-    font-size:18px;
-  }
-  .nav-links { display:flex; align-items:center; gap:4px; }
-  .nav-links a {
-    color:var(--muted); text-decoration:none; font-size:14px; font-weight:500;
-    padding:6px 12px; border-radius:8px; transition:all 0.2s;
-  }
-  .nav-links a:hover { color:var(--text); background:var(--bg3); }
-  .nav-btn {
-    background:var(--gold); color:#000; font-weight:600; font-size:14px;
-    padding:8px 18px; border-radius:10px; border:none; cursor:pointer;
-    transition:all 0.2s; white-space:nowrap;
-  }
-  .nav-btn:hover { background:#e0a820; transform:translateY(-1px); }
-  .connect-btn {
-    background:transparent; color:var(--accent2); font-weight:600; font-size:14px;
-    padding:8px 18px; border-radius:10px; border:1px solid var(--accent);
-    cursor:pointer; transition:all 0.2s;
-  }
-  .connect-btn:hover { background:rgba(59,130,246,0.1); }
+/* PAGES */
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
 
-  /* HERO */
-  .hero {
-    position:relative; z-index:1;
-    padding:80px 32px 60px;
-    text-align:center;
-    overflow:hidden;
-  }
-  .hero::before {
-    content:'';
-    position:absolute; top:-100px; left:50%; transform:translateX(-50%);
-    width:600px; height:600px;
-    background:radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
-    pointer-events:none;
-  }
-  .hero-eyebrow {
-    display:inline-flex; align-items:center; gap:8px;
-    background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3);
-    color:var(--accent2); font-size:13px; font-weight:500;
-    padding:6px 14px; border-radius:20px; margin-bottom:24px;
-  }
-  .hero h1 {
-    font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(36px,6vw,72px); font-weight:700; line-height:1.1;
-    color:#fff; margin-bottom:20px;
-  }
-  .hero h1 span { color:var(--accent2); }
-  .hero p { color:var(--muted); font-size:18px; max-width:560px; margin:0 auto 36px; line-height:1.6; }
-  .hero-stats {
-    display:flex; justify-content:center; gap:48px; margin-bottom:40px;
-    flex-wrap:wrap;
-  }
-  .stat { text-align:center; }
-  .stat-val { font-size:28px; font-weight:700; color:#fff; font-family:'Space Grotesk',sans-serif; }
-  .stat-val span { color:var(--accent2); }
-  .stat-label { font-size:12px; color:var(--muted); margin-top:2px; }
+/* HOME HERO */
+.hero{padding:60px 24px 40px;text-align:center;position:relative;}
+.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,0.1) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:var(--accent2);font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;margin-bottom:20px;}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,5vw,64px);font-weight:700;line-height:1.1;color:#fff;margin-bottom:16px;}
+.hero h1 span{color:var(--accent2);}
+.hero p{color:var(--muted);font-size:16px;max-width:500px;margin:0 auto 32px;line-height:1.6;}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-bottom:48px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-val{font-size:26px;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif;}
+.stat-val span{color:var(--accent2);}
+.stat-label{font-size:11px;color:var(--muted);margin-top:2px;}
 
-  /* FEATURES */
-  .features {
-    position:relative; z-index:1;
-    display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
-    max-width:1100px; margin:0 auto 60px; padding:0 32px;
-  }
-  .feature-card {
-    background:var(--card); border:1px solid var(--border);
-    border-radius:16px; padding:24px;
-    transition:border-color 0.2s;
-  }
-  .feature-card:hover { border-color:var(--accent); }
-  .feature-icon { font-size:28px; margin-bottom:12px; }
-  .feature-tag { font-size:11px; color:var(--accent2); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
-  .feature-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; }
-  .feature-desc { font-size:13px; color:var(--muted); line-height:1.6; }
+/* FEATURES */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1000px;margin:0 auto 48px;padding:0 24px;}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.2s;}
+.feature-card:hover{border-color:var(--accent);}
+.feature-icon{font-size:24px;margin-bottom:10px;}
+.feature-tag{font-size:10px;color:var(--accent2);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.feature-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;}
+.feature-desc{font-size:12px;color:var(--muted);line-height:1.6;}
 
-  /* SLIDER */
-  .slider-section { position:relative; z-index:1; max-width:1100px; margin:0 auto 60px; padding:0 32px; }
-  .slider-wrap { border-radius:20px; overflow:hidden; position:relative; height:320px; background:var(--card); border:1px solid var(--border); }
-  .slide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.6s; }
-  .slide.active { opacity:1; }
-  .slide-inner { display:flex; align-items:center; gap:48px; padding:40px; width:100%; }
-  .slide-text h2 { font-family:'Space Grotesk',sans-serif; font-size:32px; font-weight:700; color:#fff; margin-bottom:12px; }
-  .slide-text p { color:var(--muted); font-size:15px; line-height:1.6; max-width:400px; }
-  .slide-text .cta { display:inline-block; margin-top:20px; background:var(--gold); color:#000; font-weight:600; padding:10px 22px; border-radius:10px; text-decoration:none; font-size:14px; }
-  .slide-visual { flex-shrink:0; width:200px; height:200px; border-radius:20px; background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(96,165,250,0.08)); border:1px solid rgba(59,130,246,0.2); display:flex; align-items:center; justify-content:center; font-size:80px; }
-  .slide-dots { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
-  .dot { width:8px; height:8px; border-radius:4px; background:var(--border); cursor:pointer; transition:all 0.3s; }
-  .dot.active { width:24px; background:var(--accent2); }
-  .slide-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:2; }
-  .slide-prev { left:12px; }
-  .slide-next { right:12px; }
+/* TOKEN LIST */
+.token-section{max-width:1000px;margin:0 auto;padding:0 24px 60px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;width:260px;}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
+.search-bar input::placeholder{color:var(--muted);}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;}
+.tab{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.tab.active{background:var(--bg3);color:var(--text);}
+.token-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.token-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.2s;}
+.token-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.token-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.token-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(96,165,250,0.1));overflow:hidden;}
+.token-avatar img{width:100%;height:100%;object-fit:cover;}
+.token-name{font-weight:700;color:#fff;font-size:14px;}
+.token-sym{font-size:11px;color:var(--muted);margin-top:1px;}
+.badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;}
+.badge-minting{background:rgba(16,185,129,0.15);color:var(--green);}
+.badge-soon{background:rgba(240,180,41,0.15);color:var(--gold);}
+.badge-done{background:rgba(100,116,139,0.15);color:var(--muted);}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+.progress-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1s ease;}
+.token-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.meta-item{background:var(--bg3);border-radius:6px;padding:6px 8px;}
+.meta-label{font-size:9px;color:var(--muted);margin-bottom:1px;}
+.meta-val{font-size:12px;font-weight:600;color:var(--text);}
 
-  /* TOKEN LIST */
-  .token-section { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 32px 80px; }
-  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
-  .section-title { font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; color:#fff; }
-  .search-bar {
-    display:flex; align-items:center; gap:8px;
-    background:var(--card); border:1px solid var(--border);
-    border-radius:12px; padding:10px 16px; width:300px;
-  }
-  .search-bar input { background:none; border:none; outline:none; color:var(--text); font-size:14px; width:100%; }
-  .search-bar input::placeholder { color:var(--muted); }
-  .tab-bar { display:flex; gap:4px; margin-bottom:20px; }
-  .tab { padding:8px 16px; border-radius:8px; border:none; background:transparent; color:var(--muted); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; }
-  .tab.active { background:var(--bg3); color:var(--text); }
-  .tab:hover:not(.active) { color:var(--text); }
-  .token-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-  .token-card {
-    background:var(--card); border:1px solid var(--border);
-    border-radius:16px; padding:20px; cursor:pointer;
-    transition:all 0.2s; position:relative; overflow:hidden;
-  }
-  .token-card:hover { border-color:var(--accent); transform:translateY(-2px); }
-  .token-card::before {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(135deg,rgba(59,130,246,0.04),transparent);
-    opacity:0; transition:opacity 0.2s;
-  }
-  .token-card:hover::before { opacity:1; }
-  .token-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-  .token-avatar {
-    width:48px; height:48px; border-radius:12px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px; flex-shrink:0;
-  }
-  .token-name { font-weight:700; color:#fff; font-size:15px; }
-  .token-sym { font-size:12px; color:var(--muted); margin-top:2px; }
-  .badge {
-    margin-left:auto; font-size:11px; font-weight:600; padding:3px 8px;
-    border-radius:6px;
-  }
-  .badge-minting { background:rgba(16,185,129,0.15); color:var(--green); }
-  .badge-soon { background:rgba(240,180,41,0.15); color:var(--gold); }
-  .badge-done { background:rgba(100,116,139,0.15); color:var(--muted); }
-  .progress-label { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px; }
-  .progress-bar { height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; margin-bottom:16px; }
-  .progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 1s ease; }
-  .token-meta { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .meta-item { background:var(--bg3); border-radius:8px; padding:8px 10px; }
-  .meta-label { font-size:10px; color:var(--muted); margin-bottom:2px; }
-  .meta-val { font-size:13px; font-weight:600; color:var(--text); }
+/* TOKEN DETAIL PAGE */
+.detail-page{max-width:900px;margin:0 auto;padding:24px;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:24px;transition:color 0.2s;}
+.back-btn:hover{color:var(--text);}
+.detail-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;}
+.detail-left{}
+.detail-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;}
+.detail-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.detail-avatar{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(96,165,250,0.1));display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;}
+.detail-avatar img{width:100%;height:100%;object-fit:cover;}
+.detail-name{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:#fff;}
+.detail-sym{font-size:14px;color:var(--muted);}
+.detail-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.detail-stat{background:var(--bg3);border-radius:10px;padding:12px;}
+.detail-stat-label{font-size:10px;color:var(--muted);margin-bottom:4px;}
+.detail-stat-val{font-size:16px;font-weight:700;color:#fff;}
+.big-progress-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px;}
+.big-progress-bar{height:10px;background:var(--bg3);border-radius:5px;overflow:hidden;margin-bottom:8px;}
+.big-progress-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#3b82f6,#60a5fa);}
+.contract-link{display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);}
+.contract-link a{color:var(--accent2);text-decoration:none;font-family:monospace;font-size:11px;}
+.contract-link a:hover{text-decoration:underline;}
 
-  /* FOOTER */
-  footer {
-    position:relative; z-index:1;
-    border-top:1px solid var(--border); padding:32px;
-    display:flex; align-items:center; justify-content:space-between;
-    color:var(--muted); font-size:13px;
-  }
-  .footer-links { display:flex; gap:20px; }
-  .footer-links a { color:var(--muted); text-decoration:none; }
-  .footer-links a:hover { color:var(--text); }
+/* MINT CARD */
+.mint-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:sticky;top:80px;}
+.mint-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;}
+.mint-input-wrap{margin-bottom:12px;}
+.mint-input-label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.mint-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-weight:600;outline:none;transition:border-color 0.2s;}
+.mint-input:focus{border-color:var(--accent);}
+.mint-info{background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:14px;}
+.mint-info-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
+.mint-info-row:last-child{margin-bottom:0;}
+.mint-info-label{color:var(--muted);}
+.mint-info-val{color:var(--text);font-weight:600;}
+.mint-btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;margin-bottom:10px;}
+.mint-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.mint-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.refund-btn{width:100%;background:transparent;color:var(--red);font-weight:600;font-size:13px;padding:10px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);cursor:pointer;transition:all 0.2s;}
+.refund-btn:hover{background:rgba(239,68,68,0.1);}
+.launched-badge{text-align:center;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:14px;color:var(--green);font-weight:600;font-size:14px;}
 
-  @media(max-width:768px) {
-    .features { grid-template-columns:1fr; }
-    .token-grid { grid-template-columns:1fr; }
-    .hero-stats { gap:24px; }
-    nav { padding:0 16px; gap:8px; }
-    .nav-links { display:none; }
-    .slide-inner { flex-direction:column; gap:20px; padding:24px; }
-    .slide-visual { width:120px; height:120px; font-size:48px; }
-  }
+/* DEPLOY MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:480px;max-width:92vw;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--muted);}
+textarea.form-input{resize:vertical;min-height:80px;}
+.avatar-upload{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:14px;}
+.avatar-upload:hover{border-color:var(--accent);}
+.avatar-upload-preview{width:60px;height:60px;border-radius:12px;margin:0 auto 8px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.avatar-upload-preview img{width:100%;height:100%;object-fit:cover;}
+.avatar-upload p{font-size:12px;color:var(--muted);}
+.fee-notice{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--gold);margin-bottom:14px;line-height:1.5;}
+.submit-btn{width:100%;background:var(--gold);color:#000;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;}
+.submit-btn:hover{background:#e0a820;}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state .icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--muted);}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--text);z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red);color:var(--red);}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;flex-wrap:wrap;gap:12px;}
+.footer-links{display:flex;gap:16px;}
+.footer-links a{color:var(--muted);text-decoration:none;}
+.footer-links a:hover{color:var(--text);}
+
+@media(max-width:768px){
+  .features{grid-template-columns:1fr;}
+  .token-grid{grid-template-columns:1fr 1fr;}
+  .hero-stats{gap:20px;}
+  nav{padding:0 12px;gap:8px;}
+  .nav-links{display:none;}
+  .detail-grid{grid-template-columns:1fr;}
+  .detail-stats{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .token-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
-
 <canvas id="snow-canvas"></canvas>
 
-<!-- NAV -->
 <nav>
-  <a href="#" class="logo">
-    <div class="logo-icon">❄️</div>
-    Xueqiu
-  </a>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon">❄️</div>Xueqiu
+  </div>
   <div class="nav-links">
     <a href="#">📱 Telegram</a>
     <a href="#">🐦 X</a>
     <a href="#">💬 QQ群</a>
-    <a href="#">🔄 Swap</a>
-    <a href="#">🔒 LP质押</a>
-    <a href="#">🔍 审核员</a>
-    <a href="#">♻️ 重新开源</a>
+    <a href="#" onclick="showPage('swap')">🔄 Swap</a>
+    <a href="#" onclick="showPage('stake')">🔒 LP质押</a>
   </div>
-  <button class="nav-btn" onclick="showDeploy()">🚀 部署代币</button>
-  <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+  <button class="nav-btn" onclick="openDeployModal()">🚀 部署代币</button>
+  <button class="connect-btn" id="connectBtn" onclick="connectWallet()">连接钱包</button>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-eyebrow">❄️ BSC 链上代币发射台</div>
-  <h1>雪球 <span>发射台</span><br>一键铸造你的代币</h1>
-  <p>独立资金合约保障安全，链上开源透明，未达目标可紧急退款。</p>
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-val"><span>128</span></div>
-      <div class="stat-label">已部署项目</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val"><span>$2.4M</span></div>
-      <div class="stat-label">总锁仓价值</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val"><span>4,800+</span></div>
-      <div class="stat-label">参与钱包</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val"><span>100%</span></div>
-      <div class="stat-label">资金安全率</div>
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">❄️ BSC 链上代币发射台</div>
+    <h1>雪球 <span>发射台</span><br>一键铸造你的代币</h1>
+    <p>独立资金合约保障安全，链上开源透明，未达目标可紧急退款。</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-val" id="statTotal"><span>0</span></div><div class="stat-label">已部署项目</div></div>
+      <div class="stat"><div class="stat-val"><span>BSC</span></div><div class="stat-label">主网运行</div></div>
+      <div class="stat"><div class="stat-val"><span>2%</span></div><div class="stat-label">平台手续费</div></div>
+      <div class="stat"><div class="stat-val"><span>100%</span></div><div class="stat-label">资金安全率</div></div>
     </div>
   </div>
-</div>
 
-<!-- FEATURES -->
-<div class="features">
-  <div class="feature-card">
-    <div class="feature-icon">🔐</div>
-    <div class="feature-tag">独立合约</div>
-    <div class="feature-title">独立资金合约</div>
-    <div class="feature-desc">每个项目部署独立合约，记录铸造进度、资金状态和发射状态，完全透明可查。</div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <div class="feature-tag">独立合约</div>
+      <div class="feature-title">独立资金合约</div>
+      <div class="feature-desc">每个项目部署独立合约，记录铸造进度、资金状态和发射状态，完全透明可查。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <div class="feature-tag">链上开源</div>
+      <div class="feature-title">链上开源展示</div>
+      <div class="feature-desc">发射台使用统一模板，部署记录可跳转 BscScan 查看合约与交易，公开透明。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-tag">资金安全</div>
+      <div class="feature-title">不满足紧急退款</div>
+      <div class="feature-desc">铸造未打满前保留紧急撤退入口，用户可按铸造记录退回资金，无需信任。</div>
+    </div>
   </div>
-  <div class="feature-card">
-    <div class="feature-icon">🔍</div>
-    <div class="feature-tag">链上开源</div>
-    <div class="feature-title">链上开源展示</div>
-    <div class="feature-desc">发射台使用统一模板，部署记录可跳转 BscScan 查看合约与交易，公开透明。</div>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🛡️</div>
-    <div class="feature-tag">资金安全</div>
-    <div class="feature-title">不满足紧急退款</div>
-    <div class="feature-desc">铸造未打满前保留紧急撤退入口，用户可按铸造记录退回资金，无需信任。</div>
-  </div>
-</div>
 
-<!-- SLIDER -->
-<div class="slider-section">
-  <div class="slider-wrap">
-    <div class="slide active">
-      <div class="slide-inner">
-        <div class="slide-text">
-          <h2>❄️ 雪球计划启动</h2>
-          <p>加入雪球发射台，让你的项目从零到百，像雪球一样越滚越大。独立合约，资金安全，社区驱动。</p>
-          <a href="#" class="cta" onclick="showDeploy()">立即部署代币</a>
-        </div>
-        <div class="slide-visual">❄️</div>
+  <div class="token-section">
+    <div class="section-header">
+      <div class="section-title">🚀 代币发射列表</div>
+      <div class="search-bar">
+        <span style="color:var(--muted)">🔍</span>
+        <input type="text" placeholder="搜索代币名称或地址" id="searchInput" oninput="filterTokens()">
       </div>
     </div>
-    <div class="slide">
-      <div class="slide-inner">
-        <div class="slide-text">
-          <h2>🔒 LP质押挖矿</h2>
-          <p>提供流动性，赚取 XQ 奖励。质押 LP 代币，享受平台手续费分红，稳定长期收益。</p>
-          <a href="#" class="cta">进入质押</a>
-        </div>
-        <div class="slide-visual">🔒</div>
-      </div>
+    <div class="tab-bar">
+      <button class="tab active" onclick="setTab(this,'all')">全部</button>
+      <button class="tab" onclick="setTab(this,'minting')">铸造中</button>
+      <button class="tab" onclick="setTab(this,'done')">已发射</button>
     </div>
-    <div class="slide">
-      <div class="slide-inner">
-        <div class="slide-text">
-          <h2>🔄 内置 Swap</h2>
-          <p>无需离开平台即可交换代币。基于 PancakeSwap 流动性，低滑点，快速成交。</p>
-          <a href="#" class="cta">去 Swap</a>
-        </div>
-        <div class="slide-visual">🔄</div>
-      </div>
-    </div>
-    <button class="slide-nav slide-prev" onclick="changeSlide(-1)">‹</button>
-    <button class="slide-nav slide-next" onclick="changeSlide(1)">›</button>
-    <div class="slide-dots">
-      <div class="dot active" onclick="goSlide(0)"></div>
-      <div class="dot" onclick="goSlide(1)"></div>
-      <div class="dot" onclick="goSlide(2)"></div>
+    <div id="tokenGrid" class="token-grid">
+      <div class="loading"><div class="spinner"></div>加载中...</div>
     </div>
   </div>
 </div>
 
-<!-- TOKEN LIST -->
-<div class="token-section">
-  <div class="section-header">
-    <div class="section-title">🚀 代币发射列表</div>
-    <div class="search-bar">
-      <span style="color:var(--muted)">🔍</span>
-      <input type="text" placeholder="输入代币名称或合约地址" oninput="filterTokens(this.value)">
+<!-- DETAIL PAGE -->
+<div id="page-detail" class="page">
+  <div class="detail-page">
+    <div class="back-btn" onclick="showPage('home')">← 返回列表</div>
+    <div class="detail-grid">
+      <div class="detail-left">
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="detail-avatar" id="detailAvatar">🪙</div>
+            <div>
+              <div class="detail-name" id="detailName">-</div>
+              <div class="detail-sym" id="detailSym">-</div>
+            </div>
+            <span class="badge" id="detailBadge" style="margin-left:auto;font-size:12px;padding:4px 10px;">-</span>
+          </div>
+          <div class="detail-desc" id="detailDesc">-</div>
+          <div class="detail-stats">
+            <div class="detail-stat"><div class="detail-stat-label">已筹集</div><div class="detail-stat-val" id="detailRaised">-</div></div>
+            <div class="detail-stat"><div class="detail-stat-label">目标</div><div class="detail-stat-val" id="detailTarget">-</div></div>
+            <div class="detail-stat"><div class="detail-stat-label">创建时间</div><div class="detail-stat-val" id="detailDate">-</div></div>
+          </div>
+          <div class="big-progress-label">
+            <span>铸造进度</span><span id="detailPercent">0%</span>
+          </div>
+          <div class="big-progress-bar"><div class="big-progress-fill" id="detailProgressFill" style="width:0%"></div></div>
+          <div class="contract-link">
+            🔗 合约地址：<a id="detailContractLink" href="#" target="_blank">-</a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mint-card" id="mintCard">
+          <div class="mint-title">💎 参与铸造</div>
+          <div class="mint-input-wrap">
+            <div class="mint-input-label">输入 BNB 数量</div>
+            <input type="number" class="mint-input" id="mintAmount" placeholder="0.1" min="0.01" step="0.01" oninput="updateMintPreview()">
+          </div>
+          <div class="mint-info">
+            <div class="mint-info-row"><span class="mint-info-label">预计获得代币</span><span class="mint-info-val" id="mintPreviewTokens">-</span></div>
+            <div class="mint-info-row"><span class="mint-info-label">当前进度</span><span class="mint-info-val" id="mintPreviewProgress">-</span></div>
+            <div class="mint-info-row"><span class="mint-info-label">网络</span><span class="mint-info-val">BSC Mainnet</span></div>
+          </div>
+          <button class="mint-btn" id="mintBtn" onclick="doMint()">连接钱包参与铸造</button>
+          <button class="refund-btn" id="refundBtn" onclick="doRefund()" style="display:none">申请退款</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="tab-bar">
-    <button class="tab active" onclick="setTab(this,'all')">新创建</button>
-    <button class="tab" onclick="setTab(this,'soon')">即将发射</button>
-    <button class="tab" onclick="setTab(this,'today')">今日发射</button>
-    <button class="tab" onclick="setTab(this,'done')">已发射</button>
-  </div>
-  <div class="token-grid" id="tokenGrid"></div>
 </div>
 
-<!-- FOOTER -->
+<!-- DEPLOY MODAL -->
+<div class="modal-overlay" id="deployModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚀 部署新代币</div>
+      <button class="modal-close" onclick="closeDeployModal()">×</button>
+    </div>
+    <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+      <div class="avatar-upload-preview" id="avatarPreview">🪙</div>
+      <p>点击上传代币图标（可选）</p>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">代币名称 *</label>
+      <input type="text" class="form-input" id="dName" placeholder="例：Xueqiu Token">
+    </div>
+    <div class="form-group">
+      <label class="form-label">代币符号 *</label>
+      <input type="text" class="form-input" id="dSymbol" placeholder="例：XQ">
+    </div>
+    <div class="form-group">
+      <label class="form-label">项目描述</label>
+      <textarea class="form-input" id="dDesc" placeholder="简单介绍你的项目..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">发行总量 *</label>
+      <input type="number" class="form-input" id="dSupply" placeholder="1000000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">铸造目标 (BNB) *</label>
+      <input type="number" class="form-input" id="dTarget" placeholder="10">
+    </div>
+    <div class="fee-notice">💡 部署费用：0.01 BNB（平台服务费）+ 少量 gas 费。代币发射成功后平台抽取 2% 手续费，其余归项目方。</div>
+    <button class="submit-btn" id="deployBtn" onclick="doDeploy()">连接钱包并部署</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <footer>
-  <div>© 2026 Xueqiu 雪球发射台 · BSC Chain</div>
+  <div>© 2026 Xueqiu 雪球发射台 · BNB Smart Chain</div>
   <div class="footer-links">
-    <a href="#">Telegram</a>
-    <a href="#">Twitter</a>
-    <a href="#">白皮书</a>
-    <a href="#">审计报告</a>
+    <a href="#">Telegram</a><a href="#">Twitter</a><a href="#">白皮书</a>
   </div>
 </footer>
 
-<!-- DEPLOY MODAL -->
-<div id="deployModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:center;justify-content:center;">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px;width:480px;max-width:90vw;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#fff;">🚀 部署新代币</div>
-      <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;">×</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">代币名称</div>
-        <input type="text" placeholder="例：Xueqiu Token" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">代币符号</div>
-        <input type="text" placeholder="例：XQ" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">发行总量</div>
-        <input type="number" placeholder="1,000,000" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">铸造目标 (BNB)</div>
-        <input type="number" placeholder="10" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;">
-      </div>
-      <button onclick="deployToken()" style="background:var(--gold);color:#000;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;margin-top:8px;">连接钱包并部署</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script>
-// ============ 合约配置 ============
-// 部署后把工厂合约地址填在这里
+// ===== CONFIG =====
 const FACTORY_ADDRESS = '0x5Ad1ccB1326AC5fDF7F0FE5434cb3bFFeD55e83f';
+const BSC_CHAIN_ID = '0x38';
+const BSC_RPC = 'https://bsc-dataseed.binance.org/';
+const BSC_PARAMS = {chainId:BSC_CHAIN_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:[BSC_RPC],blockExplorerUrls:['https://bscscan.com/']};
 
 const FACTORY_ABI = [
   {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
   {"inputs":[{"name":"_name","type":"string"},{"name":"_symbol","type":"string"},{"name":"_maxSupply","type":"uint256"},{"name":"_mintTargetBNB","type":"uint256"}],"name":"deployToken","outputs":[{"name":"","type":"address"}],"stateMutability":"payable","type":"function"},
   {"inputs":[],"name":"getAllTokens","outputs":[{"components":[{"name":"tokenAddress","type":"address"},{"name":"name","type":"string"},{"name":"symbol","type":"string"},{"name":"creator","type":"address"},{"name":"createdAt","type":"uint256"},{"name":"mintTarget","type":"uint256"}],"name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"deployFee","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+  {"inputs":[],"name":"deployFee","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"getTokenCount","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"anonymous":false,"inputs":[{"indexed":true,"name":"tokenAddress","type":"address"},{"indexed":true,"name":"creator","type":"address"},{"name":"name","type":"string"},{"name":"symbol","type":"string"}],"name":"TokenDeployed","type":"event"}
 ];
 
 const TOKEN_ABI = [
   {"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[],"name":"refund","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[],"name":"getMintProgress","outputs":[{"name":"raised","type":"uint256"},{"name":"target","type":"uint256"},{"name":"percent","type":"uint256"}],"stateMutability":"view","type":"function"},
   {"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
   {"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"maxSupply","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"mintTarget","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
   {"inputs":[],"name":"launched","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"refundEnabled","outputs":[{"name":"","type":"bool"}],"stateMutability":"view","type":"function"},
   {"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"refund","outputs":[],"stateMutability":"nonpayable","type":"function"}
+  {"inputs":[{"name":"","type":"address"}],"name":"mintContribution","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-const BSC_CHAIN_ID = '0x38';
-const BSC_PARAMS = {
-  chainId: BSC_CHAIN_ID, chainName: 'BNB Smart Chain',
-  nativeCurrency: {name:'BNB',symbol:'BNB',decimals:18},
-  rpcUrls:['https://bsc-dataseed.binance.org/'],
-  blockExplorerUrls:['https://bscscan.com/']
-};
-
+// ===== STATE =====
 let walletAddress = null;
 let provider = null;
 let signer = null;
-// SNOW
+let readProvider = null;
+let allTokensData = [];
+let currentToken = null;
+let currentTab = 'all';
+let avatarDataUrl = null;
+// local meta store (name->desc, name->avatar since chain doesn't store these)
+let tokenMeta = JSON.parse(localStorage.getItem('xq_meta') || '{}');
+
+// ===== SNOW =====
 const canvas = document.getElementById('snow-canvas');
 const ctx = canvas.getContext('2d');
 let flakes = [];
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-resize(); window.addEventListener('resize', resize);
-for(let i=0;i<120;i++) flakes.push({
-  x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
-  r:Math.random()*2.5+0.5, sp:Math.random()*0.8+0.2,
-  wx:Math.sin(Math.random()*Math.PI*2)*0.3
-});
-function snowLoop() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='rgba(200,230,255,0.8)';
-  flakes.forEach(f => {
-    ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill();
-    f.y += f.sp; f.x += f.wx;
-    if(f.y>canvas.height) { f.y=-5; f.x=Math.random()*canvas.width; }
-    if(f.x>canvas.width) f.x=0;
-    if(f.x<0) f.x=canvas.width;
-  });
-  requestAnimationFrame(snowLoop);
-}
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resizeCanvas(); window.addEventListener('resize',resizeCanvas);
+for(let i=0;i<100;i++) flakes.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*2+0.5,sp:Math.random()*0.6+0.2,wx:Math.sin(Math.random()*Math.PI*2)*0.25});
+function snowLoop(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='rgba(180,210,255,0.7)';flakes.forEach(f=>{ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();f.y+=f.sp;f.x+=f.wx;if(f.y>canvas.height){f.y=-5;f.x=Math.random()*canvas.width;}if(f.x>canvas.width)f.x=0;if(f.x<0)f.x=canvas.width;});requestAnimationFrame(snowLoop);}
 snowLoop();
 
-// SLIDER
-let cur=0;
-const slides=document.querySelectorAll('.slide');
-const dots=document.querySelectorAll('.dot');
-function goSlide(n) {
-  slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
-  cur=n; slides[cur].classList.add('active'); dots[cur].classList.add('active');
+// ===== PAGES =====
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='home') loadTokens();
 }
-function changeSlide(d) { goSlide((cur+d+slides.length)%slides.length); }
-setInterval(()=>changeSlide(1), 4000);
 
-// TOKENS
-const tokens = [
-  {name:'雪球先锋',sym:'XQP',emoji:'❄️',progress:68,status:'minting',raised:'6.8 BNB',holders:312,target:'10 BNB'},
-  {name:'AICoin',sym:'AIC',emoji:'🤖',progress:45,status:'minting',raised:'4.5 BNB',holders:198,target:'10 BNB'},
-  {name:'MoonSnow',sym:'MOON',emoji:'🌕',progress:22,status:'minting',raised:'2.2 BNB',holders:87,target:'10 BNB'},
-  {name:'DragonBall',sym:'DB',emoji:'🐉',progress:89,status:'minting',raised:'8.9 BNB',holders:520,target:'10 BNB'},
-  {name:'PandaSwap',sym:'PANDA',emoji:'🐼',progress:5,status:'soon',raised:'0.5 BNB',holders:23,target:'10 BNB'},
-  {name:'GoldRush',sym:'GOLD',emoji:'🥇',progress:100,status:'done',raised:'10 BNB',holders:800,target:'10 BNB'},
-];
-let activeTab='all';
-function renderTokens(list) {
+// ===== TOAST =====
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type||''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ===== WALLET =====
+async function connectWallet(){
+  const btn=document.getElementById('connectBtn');
+  if(!window.ethereum){showToast('请先安装 MetaMask','error');return;}
+  try{
+    btn.textContent='连接中...';
+    provider=new ethers.BrowserProvider(window.ethereum);
+    const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+    walletAddress=accounts[0];
+    try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_CHAIN_ID}]});}
+    catch(e){if(e.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[BSC_PARAMS]});}
+    signer=await provider.getSigner();
+    const short=walletAddress.slice(0,6)+'...'+walletAddress.slice(-4);
+    btn.textContent='✅ '+short;
+    btn.style.cssText='background:rgba(16,185,129,0.15);color:#10b981;border-color:#10b981;';
+    document.getElementById('mintBtn').textContent='参与铸造';
+    document.getElementById('deployBtn').textContent='部署代币（支付 0.01 BNB）';
+    showToast('钱包连接成功 ✅','success');
+    window.ethereum.on('accountsChanged',(accs)=>{
+      if(!accs.length){walletAddress=null;signer=null;btn.textContent='连接钱包';btn.removeAttribute('style');}
+      else{walletAddress=accs[0];btn.textContent='✅ '+accs[0].slice(0,6)+'...'+accs[0].slice(-4);}
+    });
+  }catch(e){btn.textContent='连接钱包';if(e.code!==4001)showToast('连接失败：'+e.message,'error');}
+}
+
+// ===== READ PROVIDER =====
+function getReadProvider(){
+  if(!readProvider) readProvider=new ethers.JsonRpcProvider(BSC_RPC);
+  return readProvider;
+}
+
+// ===== LOAD TOKENS =====
+async function loadTokens(){
   const grid=document.getElementById('tokenGrid');
-  grid.innerHTML=list.map(t=>`
-    <div class="token-card">
+  grid.innerHTML='<div class="loading"><div class="spinner"></div>从链上读取数据...</div>';
+  try{
+    const factory=new ethers.Contract(FACTORY_ADDRESS,FACTORY_ABI,getReadProvider());
+    const tokens=await factory.getAllTokens();
+    allTokensData=[];
+    // fetch progress for each token
+    await Promise.all(tokens.map(async(t)=>{
+      try{
+        const tc=new ethers.Contract(t.tokenAddress,TOKEN_ABI,getReadProvider());
+        const [raised,target,percent]=await tc.getMintProgress();
+        const launched=await tc.launched();
+        const meta=tokenMeta[t.tokenAddress]||{};
+        allTokensData.push({
+          address:t.tokenAddress,
+          name:t.name,
+          symbol:t.symbol,
+          creator:t.creator,
+          createdAt:Number(t.createdAt),
+          mintTarget:t.mintTarget,
+          raised:raised,
+          target:target,
+          percent:Number(percent),
+          launched:launched,
+          desc:meta.desc||'',
+          avatar:meta.avatar||null
+        });
+      }catch(e){}
+    }));
+    // sort newest first
+    allTokensData.sort((a,b)=>b.createdAt-a.createdAt);
+    document.getElementById('statTotal').innerHTML='<span>'+allTokensData.length+'</span>';
+    renderTokens();
+  }catch(e){
+    grid.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>加载失败，请检查网络连接</p></div>';
+  }
+}
+
+function renderTokens(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let list=allTokensData.filter(t=>{
+    if(q && !t.name.toLowerCase().includes(q) && !t.symbol.toLowerCase().includes(q) && !t.address.toLowerCase().includes(q)) return false;
+    if(currentTab==='minting' && t.launched) return false;
+    if(currentTab==='done' && !t.launched) return false;
+    return true;
+  });
+  const grid=document.getElementById('tokenGrid');
+  if(!list.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>暂无数据</p></div>';return;}
+  grid.innerHTML=list.map(t=>{
+    const status=t.launched?'done':'minting';
+    const statusText=t.launched?'已发射':'铸造中';
+    const raised=parseFloat(ethers.formatEther(t.raised)).toFixed(3);
+    const target=parseFloat(ethers.formatEther(t.target)).toFixed(0);
+    const date=new Date(t.createdAt*1000).toLocaleDateString('zh');
+    const avatarHtml=t.avatar?`<img src="${t.avatar}" alt="">`:`<span>${t.name[0]||'🪙'}</span>`;
+    return `<div class="token-card" onclick="openDetail('${t.address}')">
       <div class="token-header">
-        <div class="token-avatar" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(96,165,250,0.1))">${t.emoji}</div>
-        <div><div class="token-name">${t.name}</div><div class="token-sym">${t.sym}</div></div>
-        <span class="badge badge-${t.status}">${t.status==='minting'?'铸造中':t.status==='soon'?'即将发射':'已发射'}</span>
+        <div class="token-avatar">${avatarHtml}</div>
+        <div><div class="token-name">${t.name}</div><div class="token-sym">${t.symbol}</div></div>
+        <span class="badge badge-${status}">${statusText}</span>
       </div>
-      <div class="progress-label"><span>铸造进度</span><span>${t.progress}%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${t.progress}%"></div></div>
+      <div class="progress-label"><span>铸造进度</span><span>${t.percent}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${t.percent}%"></div></div>
       <div class="token-meta">
-        <div class="meta-item"><div class="meta-label">已筹集</div><div class="meta-val">${t.raised}</div></div>
-        <div class="meta-item"><div class="meta-label">目标</div><div class="meta-val">${t.target}</div></div>
-        <div class="meta-item"><div class="meta-label">持有人</div><div class="meta-val">${t.holders}</div></div>
+        <div class="meta-item"><div class="meta-label">已筹集</div><div class="meta-val">${raised} BNB</div></div>
+        <div class="meta-item"><div class="meta-label">目标</div><div class="meta-val">${target} BNB</div></div>
+        <div class="meta-item"><div class="meta-label">创建</div><div class="meta-val">${date}</div></div>
         <div class="meta-item"><div class="meta-label">网络</div><div class="meta-val">BSC</div></div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
-function setTab(el,tab) {
+
+function setTab(el,tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active'); activeTab=tab;
-  const filtered = tab==='all'?tokens:tab==='soon'?tokens.filter(t=>t.status==='soon'):tab==='today'?tokens.filter(t=>t.status==='minting'):tokens.filter(t=>t.status==='done');
-  renderTokens(filtered);
+  el.classList.add('active'); currentTab=tab; renderTokens();
 }
-function filterTokens(q) {
-  renderTokens(tokens.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())||t.sym.toLowerCase().includes(q.toLowerCase())));
-}
-renderTokens(tokens);
+function filterTokens(){renderTokens();}
 
-// MODAL
-function showDeploy() { document.getElementById('deployModal').style.display='flex'; }
-function closeModal() { document.getElementById('deployModal').style.display='none'; }
-async function connectWallet() {
-  const btn = document.querySelector('.connect-btn');
-  if (!window.ethereum) {
-    alert('请先安装 MetaMask 钱包插件\nhttps://metamask.io/download/');
-    return;
+// ===== TOKEN DETAIL =====
+async function openDetail(address){
+  const t=allTokensData.find(x=>x.address===address);
+  if(!t) return;
+  currentToken=t;
+  showPage('detail');
+  const raised=parseFloat(ethers.formatEther(t.raised)).toFixed(4);
+  const target=parseFloat(ethers.formatEther(t.target)).toFixed(0);
+  const date=new Date(t.createdAt*1000).toLocaleString('zh');
+  document.getElementById('detailName').textContent=t.name;
+  document.getElementById('detailSym').textContent=t.symbol+' · '+t.address.slice(0,8)+'...';
+  document.getElementById('detailDesc').textContent=t.desc||'暂无项目描述';
+  document.getElementById('detailRaised').textContent=raised+' BNB';
+  document.getElementById('detailTarget').textContent=target+' BNB';
+  document.getElementById('detailDate').textContent=date;
+  document.getElementById('detailPercent').textContent=t.percent+'%';
+  document.getElementById('detailProgressFill').style.width=t.percent+'%';
+  const link=document.getElementById('detailContractLink');
+  link.textContent=t.address;
+  link.href='https://bscscan.com/address/'+t.address;
+  const avatarEl=document.getElementById('detailAvatar');
+  avatarEl.innerHTML=t.avatar?`<img src="${t.avatar}" alt="">`:(t.name[0]||'🪙');
+  const badge=document.getElementById('detailBadge');
+  badge.textContent=t.launched?'已发射':'铸造中';
+  badge.className='badge badge-'+(t.launched?'done':'minting');
+  if(t.launched){
+    document.getElementById('mintCard').innerHTML='<div class="launched-badge">🎉 该代币已成功发射！</div>';
+  } else {
+    document.getElementById('mintBtn').textContent=walletAddress?'参与铸造':'连接钱包参与铸造';
+    document.getElementById('refundBtn').style.display=t.refundEnabled?'block':'none';
+    updateMintPreview();
   }
-  try {
-    btn.textContent = '连接中...';
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    walletAddress = accounts[0];
-    // 切换到BSC
-    try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_ID }] });
-    } catch(e) {
-      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [BSC_PARAMS] });
+}
+
+function updateMintPreview(){
+  if(!currentToken) return;
+  const bnb=parseFloat(document.getElementById('mintAmount').value)||0;
+  if(bnb>0 && currentToken.target>0){
+    const maxSupply=parseFloat(ethers.formatEther(currentToken.maxSupply||0));
+    const target=parseFloat(ethers.formatEther(currentToken.target));
+    const tokens=(bnb/target*(maxSupply||1000000)).toFixed(0);
+    const newPercent=Math.min(100,(currentToken.percent+bnb/target*100)).toFixed(1);
+    document.getElementById('mintPreviewTokens').textContent=parseInt(tokens).toLocaleString()+' '+currentToken.symbol;
+    document.getElementById('mintPreviewProgress').textContent=currentToken.percent+'% → '+newPercent+'%';
+  } else {
+    document.getElementById('mintPreviewTokens').textContent='-';
+    document.getElementById('mintPreviewProgress').textContent=currentToken.percent+'%';
+  }
+}
+
+async function doMint(){
+  if(!walletAddress){await connectWallet();if(!walletAddress)return;}
+  const bnb=parseFloat(document.getElementById('mintAmount').value);
+  if(!bnb||bnb<=0){showToast('请输入有效的BNB数量','error');return;}
+  const btn=document.getElementById('mintBtn');
+  try{
+    btn.disabled=true; btn.textContent='⏳ 请在MetaMask确认...';
+    const tc=new ethers.Contract(currentToken.address,TOKEN_ABI,signer);
+    const tx=await tc.mint({value:ethers.parseEther(bnb.toString())});
+    btn.textContent='⏳ 等待确认...';
+    await tx.wait();
+    showToast('铸造成功！🎉','success');
+    btn.disabled=false; btn.textContent='参与铸造';
+    await loadTokens();
+    openDetail(currentToken.address);
+  }catch(e){
+    btn.disabled=false; btn.textContent='参与铸造';
+    showToast((e.reason||e.message||'铸造失败'),'error');
+  }
+}
+
+async function doRefund(){
+  if(!walletAddress){await connectWallet();if(!walletAddress)return;}
+  try{
+    const tc=new ethers.Contract(currentToken.address,TOKEN_ABI,signer);
+    const tx=await tc.refund();
+    showToast('⏳ 退款处理中...');
+    await tx.wait();
+    showToast('退款成功！','success');
+    await loadTokens();
+    showPage('home');
+  }catch(e){showToast(e.reason||e.message,'error');}
+}
+
+// ===== DEPLOY =====
+function openDeployModal(){document.getElementById('deployModal').classList.add('open');}
+function closeDeployModal(){document.getElementById('deployModal').classList.remove('open');}
+
+function handleAvatarUpload(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    avatarDataUrl=e.target.result;
+    document.getElementById('avatarPreview').innerHTML=`<img src="${avatarDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function doDeploy(){
+  if(!walletAddress){await connectWallet();if(!walletAddress)return;}
+  const name=document.getElementById('dName').value.trim();
+  const symbol=document.getElementById('dSymbol').value.trim();
+  const desc=document.getElementById('dDesc').value.trim();
+  const supply=parseInt(document.getElementById('dSupply').value);
+  const target=parseInt(document.getElementById('dTarget').value);
+  if(!name||!symbol){showToast('请填写代币名称和符号','error');return;}
+  if(!supply||supply<1){showToast('请填写有效的发行总量','error');return;}
+  if(!target||target<1){showToast('铸造目标至少 1 BNB','error');return;}
+  const btn=document.getElementById('deployBtn');
+  try{
+    btn.disabled=true; btn.textContent='⏳ 请在MetaMask确认...';
+    const factory=new ethers.Contract(FACTORY_ADDRESS,FACTORY_ABI,signer);
+    const fee=await factory.deployFee();
+    const tx=await factory.deployToken(name,symbol,supply,target,{value:fee});
+    btn.textContent='⏳ 等待区块确认...';
+    const receipt=await tx.wait();
+    // get new token address from event
+    let newAddr='';
+    try{
+      const iface=new ethers.Interface(FACTORY_ABI);
+      for(const log of receipt.logs){
+        try{const parsed=iface.parseLog(log);if(parsed&&parsed.name==='TokenDeployed'){newAddr=parsed.args[0];break;}}catch(e){}
+      }
+    }catch(e){}
+    // save meta
+    if(newAddr){
+      tokenMeta[newAddr]={desc:desc,avatar:avatarDataUrl};
+      localStorage.setItem('xq_meta',JSON.stringify(tokenMeta));
     }
-    signer = await provider.getSigner();
-    const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-    btn.textContent = '✅ ' + short;
-    btn.style.background = 'rgba(16,185,129,0.15)';
-    btn.style.color = '#10b981';
-    btn.style.borderColor = '#10b981';
-    window.ethereum.on('accountsChanged', (accs) => {
-      if(!accs.length) { walletAddress=null; signer=null; btn.textContent='连接钱包'; btn.removeAttribute('style'); }
-      else { walletAddress=accs[0]; btn.textContent='✅ '+accs[0].slice(0,6)+'...'+accs[0].slice(-4); }
-    });
-  } catch(e) {
-    btn.textContent = '连接钱包';
-    if(e.code !== 4001) alert('连接失败：' + e.message);
+    btn.disabled=false; btn.textContent='部署代币（支付 0.01 BNB）';
+    closeDeployModal();
+    showToast('代币部署成功！🎉','success');
+    await loadTokens();
+  }catch(e){
+    btn.disabled=false; btn.textContent='部署代币（支付 0.01 BNB）';
+    showToast(e.reason||e.message||'部署失败','error');
   }
 }
 
-async function deployToken() {
-  if (!walletAddress) { await connectWallet(); if (!walletAddress) return; }
+document.getElementById('deployModal').addEventListener('click',function(e){if(e.target===this)closeDeployModal();});
 
-  const nameEl = document.querySelectorAll('#deployModal input')[0];
-  const symEl  = document.querySelectorAll('#deployModal input')[1];
-  const supEl  = document.querySelectorAll('#deployModal input')[2];
-  const tgtEl  = document.querySelectorAll('#deployModal input')[3];
-
-  const tokenName = nameEl.value.trim();
-  const tokenSym  = symEl.value.trim();
-  const maxSupply = parseInt(supEl.value);
-  const mintTarget = parseInt(tgtEl.value);
-
-  if (!tokenName || !tokenSym) return alert('请填写代币名称和符号');
-  if (!maxSupply || maxSupply < 1) return alert('请填写有效的发行总量');
-  if (!mintTarget || mintTarget < 1) return alert('铸造目标至少 1 BNB');
-
-  if (!FACTORY_ADDRESS) {
-    alert('⚠️ 工厂合约尚未部署到BSC主网\n\n请联系平台管理员完成合约部署。\n\n合约代码已准备好，只需要：\n1. 用 Remix IDE 部署 XueqiuFactory 合约\n2. 填入合约地址\n\n预计费用：~0.05 BNB gas费');
-    return;
-  }
-
-  try {
-    const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-    const fee = await factory.deployFee();
-    const deployBtn = document.querySelector('#deployModal button');
-    deployBtn.textContent = '⏳ 部署中，请在MetaMask确认...';
-    deployBtn.disabled = true;
-
-    const tx = await factory.deployToken(tokenName, tokenSym, maxSupply, mintTarget, { value: fee });
-    deployBtn.textContent = '⏳ 等待区块确认...';
-    const receipt = await tx.wait();
-
-    // 从事件获取新代币地址
-    const event = receipt.logs[0];
-    const newTokenAddr = '0x' + event.topics[1].slice(26);
-
-    deployBtn.textContent = '连接钱包并部署';
-    deployBtn.disabled = false;
-    closeModal();
-    alert(`🎉 代币部署成功！\n\n合约地址：${newTokenAddr}\n\n查看：https://bscscan.com/token/${newTokenAddr}`);
-  } catch(e) {
-    document.querySelector('#deployModal button').textContent = '连接钱包并部署';
-    document.querySelector('#deployModal button').disabled = false;
-    alert('部署失败：' + (e.reason || e.message));
-  }
-}
-document.getElementById('deployModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+// init
+loadTokens();
 </script>
 </body>
 </html>
